@@ -27,7 +27,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
           Authorization: `Bearer ${key}`,
         },
         body: JSON.stringify({
-          model: "gpt-4o",
+          model: "gpt-4-vision-preview",
           messages: [
             {
               role: "user",
@@ -43,6 +43,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
               ],
             },
           ],
+          max_tokens: 500,
         }),
       });
 
@@ -66,41 +67,44 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
     }
   };
 
-  useEffect(() => {
-    const analyzeImages = async () => {
-      if (!images?.length || analyzing || !apiKey) return;
-      
-      setAnalyzing(true);
-      console.log("Starting OpenAI image analysis...");
-      
-      try {
-        for (const image of images) {
-          const imageUrl = URL.createObjectURL(image);
-          await analyzeWithOpenAI(imageUrl, apiKey);
-          URL.revokeObjectURL(imageUrl);
-        }
-        
-        toast({
-          title: "Analysis Complete",
-          description: "Your garden has been analyzed successfully!",
-        });
-      } catch (error) {
-        console.error("Error analyzing images:", error);
-        toast({
-          title: "Analysis Failed",
-          description: "Please check your API key and try again.",
-          variant: "destructive",
-        });
-        setPlantDiversity("Unable to analyze plant diversity. Please try again.");
-        setHabitatStructure("Unable to analyze habitat structure. Please try again.");
-        setWildlifeSupport("Unable to analyze wildlife support. Please try again.");
-      } finally {
-        setAnalyzing(false);
-      }
-    };
+  const handleAnalyze = async () => {
+    if (!images?.length || !apiKey) {
+      toast({
+        title: "Missing Requirements",
+        description: "Please provide both images and an API key.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    analyzeImages();
-  }, [images, apiKey]);
+    setAnalyzing(true);
+    console.log("Starting OpenAI image analysis...");
+
+    try {
+      for (const image of images) {
+        const imageUrl = URL.createObjectURL(image);
+        await analyzeWithOpenAI(imageUrl, apiKey);
+        URL.revokeObjectURL(imageUrl);
+      }
+
+      toast({
+        title: "Analysis Complete",
+        description: "Your garden has been analyzed successfully!",
+      });
+    } catch (error) {
+      console.error("Error analyzing images:", error);
+      toast({
+        title: "Analysis Failed",
+        description: "Please check your API key and try again.",
+        variant: "destructive",
+      });
+      setPlantDiversity("Unable to analyze plant diversity. Please try again.");
+      setHabitatStructure("Unable to analyze habitat structure. Please try again.");
+      setWildlifeSupport("Unable to analyze wildlife support. Please try again.");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   if (isLoading || analyzing) {
     return (
@@ -121,6 +125,13 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
           onChange={(e) => setApiKey(e.target.value)}
           className="w-full"
         />
+        <Button 
+          onClick={handleAnalyze}
+          disabled={!apiKey || !images?.length}
+          className="w-full"
+        >
+          Analyze Garden
+        </Button>
         <p className="text-sm text-gray-500">
           Your API key is required for image analysis. It will not be stored.
         </p>
@@ -134,7 +145,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
             <h3 className="font-medium">Plant Diversity</h3>
           </div>
           <p className="text-sm text-gray-600">
-            {plantDiversity || "Enter your API key to analyze plant diversity"}
+            {plantDiversity || "Enter your API key and click Analyze to begin"}
           </p>
         </Card>
         <Card className="p-4 border-garden-secondary">
@@ -143,7 +154,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
             <h3 className="font-medium">Habitat Structure</h3>
           </div>
           <p className="text-sm text-gray-600">
-            {habitatStructure || "Enter your API key to analyze habitat structure"}
+            {habitatStructure || "Enter your API key and click Analyze to begin"}
           </p>
         </Card>
         <Card className="p-4 border-garden-secondary">
@@ -152,7 +163,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
             <h3 className="font-medium">Wildlife Support</h3>
           </div>
           <p className="text-sm text-gray-600">
-            {wildlifeSupport || "Enter your API key to analyze wildlife support"}
+            {wildlifeSupport || "Enter your API key and click Analyze to begin"}
           </p>
         </Card>
       </div>
