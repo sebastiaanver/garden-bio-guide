@@ -1,14 +1,15 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 serve(async (req) => {
-  console.log('Received request to analyze garden images');
-  
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -45,10 +46,10 @@ serve(async (req) => {
     }
 
     console.log('Initiating OpenAI analysis...');
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -56,51 +57,53 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a garden biodiversity expert analyzing garden images. Your task is to assess various aspects of the garden's biodiversity and management practices. Analyze the following aspects:
+            content: `You are a garden biodiversity expert analyzing garden images. Your task is to assess various aspects of the garden's biodiversity and management practices. Analyze the following aspects and respond with a JSON object containing these fields:
 
-1. landSize: ("small" < 500 m², "medium" 500-2000 m², "large" > 2000 m²)
-2. landUse: ("private_garden", "agricultural", "mixed")
-3. currentMeasures: ("yes", "no", "not_sure")
-4. vegetationTypes: Array of ["lawn", "wildflower", "native_trees", "exotic", "vegetables", "other"]
-5. nativeSpecies: ("mostly_native", "mixed", "mostly_non_native")
-6. vegetationHeight: ("diverse", "some_variation", "uniform")
-7. wildlifeFeatures: Array of ["hedgehog_house", "birdhouses", "bat_boxes", "bee_hotel", "log_piles", "none"]
-8. waterFeatures: ("natural_pond", "man_made_pond", "no_water")
-9. foodSources: ("year_round", "seasonally", "no")
-10. grassManagement: ("mow_regularly", "leave_uncut", "rotational_mowing")
-11. chemicalUse: ("frequently", "occasionally", "natural_methods")
-12. soilHealth: ("compost", "chemical_fertilizers", "no_management")
-13. landConnectivity: ("well_connected", "somewhat_connected", "isolated")
-14. wildlifeBarriers: ("many_barriers", "some_barriers", "accessible")
-15. sustainableUse: ("yes", "no")
-16. improvements: ("actively_looking", "maybe", "satisfied")
-17. aspectsToImprove: Array of ["wildlife_habitats", "plant_diversity", "water_retention", "reducing_pesticide", "encouraging_pollinators", "other"]`
+landSize: ("small" < 500 m², "medium" 500-2000 m², "large" > 2000 m²)
+landUse: ("private_garden", "agricultural", "mixed")
+currentMeasures: ("yes", "no", "not_sure")
+vegetationTypes: Array of ["lawn", "wildflower", "native_trees", "exotic", "vegetables", "other"]
+nativeSpecies: ("mostly_native", "mixed", "mostly_non_native")
+vegetationHeight: ("diverse", "some_variation", "uniform")
+wildlifeFeatures: Array of ["hedgehog_house", "birdhouses", "bat_boxes", "bee_hotel", "log_piles", "none"]
+waterFeatures: ("natural_pond", "man_made_pond", "no_water")
+foodSources: ("year_round", "seasonally", "no")
+grassManagement: ("mow_regularly", "leave_uncut", "rotational_mowing")
+chemicalUse: ("frequently", "occasionally", "natural_methods")
+soilHealth: ("compost", "chemical_fertilizers", "no_management")
+landConnectivity: ("well_connected", "somewhat_connected", "isolated")
+wildlifeBarriers: ("many_barriers", "some_barriers", "accessible")
+sustainableUse: ("yes", "no")
+improvements: ("actively_looking", "maybe", "satisfied")
+aspectsToImprove: Array of ["wildlife_habitats", "plant_diversity", "water_retention", "reducing_pesticide", "encouraging_pollinators", "other"]
+
+Remember to respond with a valid JSON object containing all these fields.`
           },
-          {
+          ...imageUrls.map(url => ({
             role: 'user',
             content: [
-              ...imageUrls.map(url => ({
+              {
                 type: "image_url",
                 image_url: {
                   url: url,
                   detail: "high"
                 }
-              }))
+              }
             ]
-          }
+          }))
         ],
         temperature: 0.3,
         response_format: { type: "json_object" }
       }),
     });
 
-    if (!openAIResponse.ok) {
-      const errorData = await openAIResponse.json();
+    if (!response.ok) {
+      const errorData = await response.json();
       console.error('OpenAI API error:', errorData);
       throw new Error(`OpenAI API error: ${JSON.stringify(errorData)}`);
     }
 
-    const data = await openAIResponse.json();
+    const data = await response.json();
     console.log('Received OpenAI response:', data);
 
     if (!data.choices?.[0]?.message?.content) {
