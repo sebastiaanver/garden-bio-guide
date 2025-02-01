@@ -255,13 +255,13 @@ const Index = () => {
               <div className="relative">
                 <Button
                   variant={selectedOption === "questionnaire" ? "default" : "outline"}
-                  className={`w-full p-8 h-auto flex flex-col items-center space-y-4 ${
+                  className={`w-full p-8 h-auto flex flex-col items-center space-y-4 whitespace-normal ${
                     selectedOption === "questionnaire" ? "bg-garden-primary" : ""
                   }`}
                   onClick={() => setSelectedOption("questionnaire")}
                 >
-                  <span className="text-xl font-semibold">Fill Questionnaire</span>
-                  <p className="text-sm opacity-80">
+                  <span className="text-xl font-semibold break-words">Fill Questionnaire</span>
+                  <p className="text-sm opacity-80 break-words">
                     Answer questions about your garden's features and management practices to receive personalized recommendations.
                   </p>
                 </Button>
@@ -270,13 +270,13 @@ const Index = () => {
               <div className="relative">
                 <Button
                   variant={selectedOption === "upload" ? "default" : "outline"}
-                  className={`w-full p-8 h-auto flex flex-col items-center space-y-4 ${
+                  className={`w-full p-8 h-auto flex flex-col items-center space-y-4 whitespace-normal ${
                     selectedOption === "upload" ? "bg-garden-primary" : ""
                   }`}
                   onClick={() => setSelectedOption("upload")}
                 >
-                  <span className="text-xl font-semibold">Upload Photos</span>
-                  <p className="text-sm opacity-80">
+                  <span className="text-xl font-semibold break-words">Upload Photos</span>
+                  <p className="text-sm opacity-80 break-words">
                     Upload photos of your garden and let our AI analyze them to provide tailored biodiversity recommendations.
                   </p>
                 </Button>
