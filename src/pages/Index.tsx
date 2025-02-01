@@ -231,7 +231,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-6 bg-white p-8 rounded-lg shadow-sm">
+        <div className="max-w-6xl mx-auto space-y-6 bg-white p-8 rounded-lg shadow-sm">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -251,7 +251,7 @@ const Index = () => {
 
           <div className="space-y-4">
             <Label>Choose an option:</Label>
-            <div className="grid grid-cols-1 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="relative">
                 <Button
                   variant={selectedOption === "questionnaire" ? "default" : "outline"}
@@ -265,10 +265,6 @@ const Index = () => {
                     Answer questions about your garden's features and management practices to receive personalized recommendations.
                   </p>
                 </Button>
-              </div>
-
-              <div className="text-center text-xl font-semibold text-gray-500">
-                OR
               </div>
 
               <div className="relative">
