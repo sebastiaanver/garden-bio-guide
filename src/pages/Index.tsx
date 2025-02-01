@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Flower2 } from "lucide-react";
+import { Flower2, Upload, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ImageUpload from "@/components/ImageUpload";
 import PostalCodeInput from "@/components/PostalCodeInput";
 import Analysis from "@/components/Analysis";
 import { useToast } from "@/components/ui/use-toast";
+import BiodiversityQuestionnaire from "@/components/BiodiversityQuestionnaire";
 
 const Index = () => {
   const [images, setImages] = useState<File[]>([]);
   const [postalCode, setPostalCode] = useState("");
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<"questionnaire" | "upload" | null>(null);
   const { toast } = useToast();
 
   const handleImagesSelected = (files: File[]) => {
@@ -42,7 +44,6 @@ const Index = () => {
     }
 
     setIsAnalyzing(true);
-    // Simulate analysis delay
     setTimeout(() => {
       setIsAnalyzing(false);
       setShowAnalysis(true);
@@ -56,31 +57,72 @@ const Index = () => {
           <div className="flex justify-center">
             <Flower2 className="w-12 h-12 text-garden-primary" />
           </div>
-          <h1 className="text-4xl font-bold text-garden-primary">Garden Biodiversity Analyzer</h1>
+          <h1 className="text-4xl font-bold text-garden-primary">
+            Garden Biodiversity Analyzer
+          </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Upload photos of your garden and discover ways to enhance its biodiversity. Get personalized recommendations based on your location and current garden composition.
+            Assess your garden's biodiversity and get personalized recommendations to enhance it.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-8 bg-white p-8 rounded-lg shadow-sm">
-          <ImageUpload onImagesSelected={handleImagesSelected} />
-          
-          <div className="space-y-4">
-            <PostalCodeInput value={postalCode} onChange={setPostalCode} />
-            
+        {!selectedOption ? (
+          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
             <Button
-              onClick={analyzeGarden}
-              className="bg-garden-primary hover:bg-garden-secondary transition-colors"
-              disabled={isAnalyzing}
+              onClick={() => setSelectedOption("questionnaire")}
+              className="p-8 h-auto flex flex-col items-center space-y-4 bg-white hover:bg-gray-50"
+              variant="outline"
             >
-              {isAnalyzing ? "Analyzing..." : "Analyze Garden"}
+              <ClipboardList className="w-12 h-12 text-garden-primary" />
+              <div className="text-center">
+                <h3 className="font-semibold text-lg">Fill out Questionnaire</h3>
+                <p className="text-sm text-gray-600">
+                  Answer questions about your garden to receive personalized recommendations
+                </p>
+              </div>
+            </Button>
+            <Button
+              disabled
+              className="p-8 h-auto flex flex-col items-center space-y-4 bg-white"
+              variant="outline"
+            >
+              <Upload className="w-12 h-12 text-gray-400" />
+              <div className="text-center">
+                <h3 className="font-semibold text-lg text-gray-400">
+                  Upload Photos (Coming Soon)
+                </h3>
+                <p className="text-sm text-gray-400">
+                  Let AI analyze your garden photos and provide recommendations
+                </p>
+              </div>
             </Button>
           </div>
-
-          {(showAnalysis || isAnalyzing) && (
-            <Analysis isLoading={isAnalyzing} />
-          )}
-        </div>
+        ) : (
+          <div className="max-w-4xl mx-auto space-y-8 bg-white p-8 rounded-lg shadow-sm">
+            {selectedOption === "questionnaire" ? (
+              <BiodiversityQuestionnaire />
+            ) : (
+              <>
+                <ImageUpload onImagesSelected={handleImagesSelected} />
+                <PostalCodeInput value={postalCode} onChange={setPostalCode} />
+                <Button
+                  onClick={analyzeGarden}
+                  className="bg-garden-primary hover:bg-garden-secondary transition-colors"
+                  disabled={isAnalyzing}
+                >
+                  {isAnalyzing ? "Analyzing..." : "Analyze Garden"}
+                </Button>
+                {(showAnalysis || isAnalyzing) && <Analysis isLoading={isAnalyzing} />}
+              </>
+            )}
+            <Button
+              variant="outline"
+              onClick={() => setSelectedOption(null)}
+              className="mt-4"
+            >
+              Back to Options
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
