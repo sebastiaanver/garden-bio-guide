@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { Flower2 } from "lucide-react";
 
-const BiodiversityQuestionnaire = () => {
+interface BiodiversityQuestionnaireProps {
+  initialRecommendations?: number[];
+  skipQuestionnaire?: boolean;
+}
+
+const BiodiversityQuestionnaire = ({ 
+  initialRecommendations,
+  skipQuestionnaire = false 
+}: BiodiversityQuestionnaireProps) => {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({});
   const [currentSection, setCurrentSection] = useState(0);
@@ -18,6 +26,13 @@ const BiodiversityQuestionnaire = () => {
   const [recommendations, setRecommendations] = useState<number[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (skipQuestionnaire && initialRecommendations) {
+      setRecommendations(initialRecommendations);
+      setShowRecommendations(true);
+    }
+  }, [skipQuestionnaire, initialRecommendations]);
 
   const handleSingleAnswer = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));

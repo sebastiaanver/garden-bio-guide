@@ -5,6 +5,7 @@ import ImageUpload from "@/components/ImageUpload";
 import { useToast } from "@/components/ui/use-toast";
 import BiodiversityQuestionnaire from "@/components/BiodiversityQuestionnaire";
 import { supabase } from "@/integrations/supabase/client";
+import { analyzeQuestionnaire } from "@/utils/analyzeQuestionnaire";
 
 const Index = () => {
   const [images, setImages] = useState<File[]>([]);
@@ -75,8 +76,15 @@ const Index = () => {
 
       console.log('Analysis results:', data);
 
-      // Pass the answers to BiodiversityQuestionnaire
+      // Automatically analyze the questionnaire with the AI-generated answers
+      const recommendations = await analyzeQuestionnaire(data.answers);
+      
+      // Update BiodiversityQuestionnaire component to show recommendations
       setSelectedOption("questionnaire");
+      
+      // Pass the recommendations directly to BiodiversityQuestionnaire
+      return <BiodiversityQuestionnaire initialRecommendations={recommendations} skipQuestionnaire={true} />;
+
     } catch (error) {
       console.error('Error analyzing garden:', error);
       toast({
