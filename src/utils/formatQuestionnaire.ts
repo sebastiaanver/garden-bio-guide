@@ -2,18 +2,23 @@ export const formatQuestionnaireForAnalysis = (
   answers: Record<string, string | string[]>,
   customAnswers: Record<string, string>
 ) => {
-  let formattedText = "Biodiversity Assessment Results:\n\n";
+  const formattedAnswers: Record<string, any> = {};
 
-  // Format each answer
+  // Group answers by section
   Object.entries(answers).forEach(([questionId, answer]) => {
-    const section = questionId.split("_")[0];
-    formattedText += `Question ID: ${questionId}\n`;
-    formattedText += `Answer: ${Array.isArray(answer) ? answer.join(", ") : answer}\n`;
-    if (customAnswers[questionId]) {
-      formattedText += `Custom Input: ${customAnswers[questionId]}\n`;
+    const [section] = questionId.split('_');
+    
+    if (!formattedAnswers[section]) {
+      formattedAnswers[section] = {};
     }
-    formattedText += "\n";
+    
+    formattedAnswers[section][questionId] = answer;
+    
+    // Add any custom answers if they exist
+    if (customAnswers[questionId]) {
+      formattedAnswers[section][`${questionId}_custom`] = customAnswers[questionId];
+    }
   });
 
-  return formattedText;
+  return formattedAnswers;
 };
