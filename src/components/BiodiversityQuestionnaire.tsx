@@ -12,11 +12,23 @@ import { Flower2 } from "lucide-react";
 
 interface BiodiversityQuestionnaireProps {
   initialRecommendations?: number[];
+  initialDifficultyScores?: Record<number, number>;
+  initialImpactScores?: Record<number, number>;
+  initialEnvironmentScores?: Record<number, number>;
+  initialDifficultyReasonings?: Record<number, string>;
+  initialImpactReasonings?: Record<number, string>;
+  initialEnvironmentReasonings?: Record<number, string>;
   skipQuestionnaire?: boolean;
 }
 
 const BiodiversityQuestionnaire = ({ 
   initialRecommendations,
+  initialDifficultyScores,
+  initialImpactScores,
+  initialEnvironmentScores,
+  initialDifficultyReasonings,
+  initialImpactReasonings,
+  initialEnvironmentReasonings,
   skipQuestionnaire = false 
 }: BiodiversityQuestionnaireProps) => {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -36,13 +48,15 @@ const BiodiversityQuestionnaire = ({
   useEffect(() => {
     if (skipQuestionnaire && initialRecommendations) {
       setRecommendations(initialRecommendations);
-      setEnvironmentScores(initialRecommendations?.reduce((acc, id) => ({
-        ...acc,
-        [id]: 3
-      }), {}));
       setShowRecommendations(true);
+      setDifficultyScores(initialDifficultyScores);
+      setImpactScores(initialImpactScores);
+      setEnvironmentScores(initialEnvironmentScores);
+      setDifficultyReasonings(initialDifficultyReasonings);
+      setImpactReasonings(initialImpactReasonings);
+      setEnvironmentReasonings(initialEnvironmentReasonings);
     }
-  }, [skipQuestionnaire, initialRecommendations]);
+  }, [skipQuestionnaire, initialRecommendations, initialDifficultyScores, initialImpactScores, initialEnvironmentScores, initialDifficultyReasonings, initialImpactReasonings, initialEnvironmentReasonings]);
 
   const handleSingleAnswer = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));

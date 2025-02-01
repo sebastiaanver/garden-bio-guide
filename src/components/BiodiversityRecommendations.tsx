@@ -4,11 +4,6 @@ import { measures } from "./biodiversity/measures";
 import MeasureCard from "./biodiversity/MeasureCard";
 import type { BiodiversityProps, Measure, ReasoningType } from "./biodiversity/types";
 
-const getReasoningValue = (reasoning: ReasoningType | undefined): string | undefined => {
-  if (!reasoning) return undefined;
-  if (typeof reasoning === 'string') return reasoning;
-  return reasoning.value;
-};
 
 const BiodiversityRecommendations = ({ 
   recommendations, 
@@ -44,9 +39,9 @@ const BiodiversityRecommendations = ({
         environmentScore: environmentScores[measure.id],
         difficultyScore: difficultyScores[measure.id],
         impactScore: impactScores[measure.id],
-        difficultyReasoning: getReasoningValue(difficultyReasonings[measure.id]),
-        impactReasoning: getReasoningValue(impactReasonings[measure.id]),
-        environmentReasoning: getReasoningValue(environmentReasonings[measure.id])
+        difficultyReasoning: difficultyReasonings[measure.id],
+        impactReasoning: impactReasonings[measure.id],
+        environmentReasoning: environmentReasonings[measure.id]
       };
       
       console.log(`Processing measure ${measure.id}:`, enrichedMeasure);

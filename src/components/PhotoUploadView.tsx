@@ -15,6 +15,12 @@ const PhotoUploadView = ({ name, onStartOver }: PhotoUploadViewProps) => {
   const [images, setImages] = useState<File[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recommendations, setRecommendations] = useState<number[]>([]);
+  const [difficultyScores, setDifficultyScores] = useState<Record<number, number>>({});
+  const [impactScores, setImpactScores] = useState<Record<number, number>>({});
+  const [environmentScores, setEnvironmentScores] = useState<Record<number, number>>({});
+  const [difficultyReasonings, setDifficultyReasonings] = useState<Record<number, string>>({});
+  const [impactReasonings, setImpactReasonings] = useState<Record<number, string>>({});
+  const [environmentReasonings, setEnvironmentReasonings] = useState<Record<number, string>>({});
   const [skipQuestionnaire, setSkipQuestionnaire] = useState(false);
   const { toast } = useToast();
 
@@ -106,6 +112,12 @@ const PhotoUploadView = ({ name, onStartOver }: PhotoUploadViewProps) => {
       }
 
       setRecommendations(recommendedMeasures.data.recommendations);
+      setDifficultyScores(recommendedMeasures.data.difficultyScores);
+      setImpactScores(recommendedMeasures.data.impactScores);
+      setEnvironmentScores(recommendedMeasures.data.environmentScores);
+      setDifficultyReasonings(recommendedMeasures.data.difficultyReasonings);
+      setImpactReasonings(recommendedMeasures.data.impactReasonings);
+      setEnvironmentReasonings(recommendedMeasures.data.environmentReasonings);
       setSkipQuestionnaire(true);
 
     } catch (error) {
@@ -153,6 +165,12 @@ const PhotoUploadView = ({ name, onStartOver }: PhotoUploadViewProps) => {
           <BiodiversityQuestionnaire 
             skipQuestionnaire={true} 
             initialRecommendations={recommendations}
+            initialDifficultyScores={difficultyScores}
+            initialImpactScores={impactScores}
+            initialEnvironmentScores={environmentScores}
+            initialDifficultyReasonings={difficultyReasonings}
+            initialImpactReasonings={impactReasonings}
+            initialEnvironmentReasonings={environmentReasonings}
           />
         )}
         <Button
