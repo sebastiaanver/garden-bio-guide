@@ -46,19 +46,20 @@ Available measures:
 Return a JSON object with three properties:
 1. recommendations: array of recommended measure IDs (numbers 1-15)
 2. environmentScores: object mapping measure IDs to environment scores (1-5)
-3. scoreReasonings: object mapping measure IDs to strings explaining the reasoning behind each score
+3. scoreReasonings: object mapping measure IDs to strings explaining the specific reasoning for each environment score based on the questionnaire responses
 
 Example response format:
 {
   "recommendations": [1, 2, 8],
   "environmentScores": {"1": 4, "2": 5, "8": 3},
   "scoreReasonings": {
-    "1": "High score due to garden size and existing vegetation providing good shelter",
-    "2": "Perfect match given soil conditions and climate",
-    "8": "Moderate score due to limited space but good sun exposure"
+    "1": "Based on the garden size of 200m² and existing hedges, this would provide excellent shelter for hedgehogs",
+    "2": "The south-facing aspect and well-draining soil make this location perfect for native plant diversity",
+    "8": "Limited space but good sun exposure allows for effective wildflower strips along borders"
   }
 }
 
+Provide detailed, specific reasonings that reference the actual questionnaire responses.
 The response must be valid JSON.`;
 
     const response = await openai.createChatCompletion({
@@ -66,7 +67,7 @@ The response must be valid JSON.`;
       messages: [
         {
           role: "system",
-          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, environment scores, and reasoning. Your response must be in JSON format."
+          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, environment scores, and specific reasoning based on the provided responses. Your response must be in JSON format."
         },
         { role: "user", content: prompt }
       ],

@@ -225,12 +225,12 @@ const BiodiversityRecommendations = ({
                     <CardContent className="space-y-4">
                       <Progress value={(calculateTotalPoints(measure) / 15) * 100} className="h-2" />
                       <div className="grid grid-cols-3 gap-2 text-sm">
-                        <div className="flex flex-col">
-                          <div className="flex items-center space-x-1">
-                            <span className="text-muted-foreground">Difficulty Points</span>
+                        <div className="flex flex-col space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">Difficulty Points</span>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
+                                <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
                               </TooltipTrigger>
                               <TooltipContent side="top">
                                 <p className="max-w-xs">
@@ -239,39 +239,39 @@ const BiodiversityRecommendations = ({
                               </TooltipContent>
                             </Tooltip>
                           </div>
-                          <span className="font-medium">{5 - measure.difficulty}</span>
+                          <span>{5 - measure.difficulty}</span>
                         </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center space-x-1">
-                            <span className="text-muted-foreground">Impact Points</span>
+                        <div className="flex flex-col space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">Impact Points</span>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
+                                <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
                               </TooltipTrigger>
                               <TooltipContent side="top">
                                 <p className="max-w-xs">
-                                  {measure.impactReasoning || "Points reflect the measure's potential positive effect on biodiversity. Higher points indicate greater benefits for local wildlife and ecosystem health."}
+                                  Points reflect the measure's potential positive effect on biodiversity. Higher points indicate greater benefits for local wildlife and ecosystem health.
                                 </p>
                               </TooltipContent>
                             </Tooltip>
                           </div>
-                          <span className="font-medium">{measure.impact}</span>
+                          <span>{measure.impact}</span>
                         </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center space-x-1">
-                            <span className="text-muted-foreground">Environment Points</span>
+                        <div className="flex flex-col space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium">Environment Points</span>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
+                                <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
                               </TooltipTrigger>
                               <TooltipContent side="top">
                                 <p className="max-w-xs">
-                                  {measure.scoreReasoning || "Points indicate how well this measure aligns with your specific environment and conditions."}
+                                  {measure.scoreReasoning || "No specific reasoning available for this environment score."}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
                           </div>
-                          <span className="font-medium">{measure.environmentScore}</span>
+                          <span>{measure.environmentScore}</span>
                         </div>
                       </div>
                       <p>{measure.description}</p>
