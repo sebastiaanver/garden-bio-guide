@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import BiodiversityQuestionnaire from "@/components/BiodiversityQuestionnaire";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeQuestionnaire } from "@/utils/analyzeQuestionnaire";
+import { formatQuestionnaireForAnalysis } from "@/utils/formatQuestionnaire";
 
 const Index = () => {
   const [name, setName] = useState("");
@@ -105,7 +106,11 @@ const Index = () => {
       const recommendedMeasures = await analyzeQuestionnaire(data.answers);
       console.log('Generated recommendations:', recommendedMeasures);
       
-      setRecommendations(recommendedMeasures.recommendations);
+      if (recommendedMeasures.error) {
+        throw new Error(recommendedMeasures.error);
+      }
+
+      setRecommendations(recommendedMeasures.data.recommendations);
       setSkipQuestionnaire(true);
 
     } catch (error) {
