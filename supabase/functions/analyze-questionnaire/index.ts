@@ -21,11 +21,11 @@ serve(async (req) => {
     });
     const openai = new OpenAIApi(configuration);
 
-    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. For each recommended measure, provide:
+    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. For each recommended measure, you MUST provide:
 1. An environment score (1-5) indicating how well the measure fits the specific garden context
 2. A difficulty score (1-5) indicating how challenging it would be to implement in this specific garden
 3. An impact score (1-5) indicating the potential positive effect on biodiversity for this specific garden
-4. Clear reasoning for all scores based on the questionnaire responses
+4. Clear reasoning for ALL scores based on the questionnaire responses
 
 Questionnaire Responses:
 ${JSON.stringify(answers, null, 2)}
@@ -47,7 +47,7 @@ Available measures:
 14 = Birdhouses
 15 = Bee Hotels
 
-Return a JSON object with these properties:
+You MUST return a JSON object with these properties:
 1. recommendations: array of recommended measure IDs (numbers 1-15)
 2. environmentScores: object mapping measure IDs to environment scores (1-5)
 3. difficultyScores: object mapping measure IDs to difficulty scores (1-5)
@@ -79,15 +79,16 @@ Example response format:
   }
 }
 
-Provide detailed, specific reasonings that reference the actual questionnaire responses.
-The response must be valid JSON with all reasonings as plain strings, not objects.`;
+IMPORTANT: You MUST provide ALL reasonings (difficulty, impact, and environment) for EACH recommended measure. Each reasoning MUST be a string that references specific aspects of the questionnaire responses. The response must be valid JSON with all reasonings as plain strings, not objects.`;
+
+    console.log('Sending prompt to OpenAI:', prompt);
 
     const response = await openai.createChatCompletion({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, scores, and specific reasoning based on the provided responses."
+          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, scores, and specific reasoning based on the provided responses. Always provide all required reasonings for each measure."
         },
         { role: "user", content: prompt }
       ],
@@ -102,7 +103,10 @@ The response must be valid JSON with all reasonings as plain strings, not object
     }
 
     const content = response.data.choices[0].message.content.trim();
+    console.log('Parsed content:', content);
+    
     const result = JSON.parse(content);
+    console.log('Parsed result:', result);
     
     // Validate response format and ensure all reasonings are string values
     if (!Array.isArray(result.recommendations) || 
@@ -112,15 +116,20 @@ The response must be valid JSON with all reasonings as plain strings, not object
         !result.difficultyReasonings ||
         !result.impactReasonings ||
         !result.environmentReasonings) {
-      throw new Error('Invalid response format from AI');
+      console.error('Missing required fields in response:', result);
+      throw new Error('Invalid response format from AI - missing required fields');
     }
 
-    // Ensure all reasonings are strings
+    // Ensure all reasonings are strings and exist for each recommendation
     for (const id of result.recommendations) {
-      if (typeof result.difficultyReasonings[id] !== 'string' ||
-          typeof result.impactReasonings[id] !== 'string' ||
-          typeof result.environmentReasonings[id] !== 'string') {
-        throw new Error('Invalid reasoning format from AI');
+      if (!result.difficultyReasonings[id] || typeof result.difficultyReasonings[id] !== 'string' ||
+          !result.impactReasonings[id] || typeof result.impactReasonings[id] !== 'string' ||
+          !result.environmentReasonings[id] || typeof result.environmentReasonings[id] !== 'string') {
+        console.error('Missing or invalid reasoning for measure:', id);
+        console.error('Difficulty:', result.difficultyReasonings[id]);
+        console.error('Impact:', result.impactReasonings[id]);
+        console.error('Environment:', result.environmentReasonings[id]);
+        throw new Error(`Invalid or missing reasoning for measure ${id}`);
       }
     }
 
