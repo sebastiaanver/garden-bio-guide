@@ -4,7 +4,8 @@ import { formatQuestionnaireForAnalysis } from './formatQuestionnaire';
 type AnalysisResult = {
   recommendations: number[];
   environmentScores: Record<number, number>;
-  scoreReasonings?: Record<number, string>;
+  difficultyReasonings?: Record<number, string>;
+  impactReasonings?: Record<number, string>;
 };
 
 type AnalysisResponse = {
@@ -31,7 +32,8 @@ export const analyzeQuestionnaire = async (
         data: {
           recommendations: [],
           environmentScores: {},
-          scoreReasonings: {}
+          difficultyReasonings: {},
+          impactReasonings: {}
         }
       };
     }
@@ -42,7 +44,8 @@ export const analyzeQuestionnaire = async (
       data: {
         recommendations: data.recommendations,
         environmentScores: data.environmentScores,
-        scoreReasonings: data.scoreReasonings
+        difficultyReasonings: data.difficultyReasonings,
+        impactReasonings: data.impactReasonings
       }
     };
   } catch (error) {
@@ -52,7 +55,8 @@ export const analyzeQuestionnaire = async (
       data: {
         recommendations: [],
         environmentScores: {},
-        scoreReasonings: {}
+        difficultyReasonings: {},
+        impactReasonings: {}
       }
     };
   }

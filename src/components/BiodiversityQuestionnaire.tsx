@@ -25,7 +25,8 @@ const BiodiversityQuestionnaire = ({
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendations, setRecommendations] = useState<number[]>([]);
   const [environmentScores, setEnvironmentScores] = useState<Record<number, number>>({});
-  const [scoreReasonings, setScoreReasonings] = useState<Record<number, string>>({});
+  const [difficultyReasonings, setDifficultyReasonings] = useState<Record<number, string>>({});
+  const [impactReasonings, setImpactReasonings] = useState<Record<number, string>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
@@ -73,8 +74,11 @@ const BiodiversityQuestionnaire = ({
       }
       setRecommendations(result.data.recommendations);
       setEnvironmentScores(result.data.environmentScores);
-      if (result.data.scoreReasonings) {
-        setScoreReasonings(result.data.scoreReasonings);
+      if (result.data.difficultyReasonings) {
+        setDifficultyReasonings(result.data.difficultyReasonings);
+      }
+      if (result.data.impactReasonings) {
+        setImpactReasonings(result.data.impactReasonings);
       }
       setShowRecommendations(true);
     } catch (error) {
@@ -154,7 +158,8 @@ const BiodiversityQuestionnaire = ({
     return <BiodiversityRecommendations 
       recommendations={recommendations}
       environmentScores={environmentScores}
-      scoreReasonings={scoreReasonings}
+      difficultyReasonings={difficultyReasonings}
+      impactReasonings={impactReasonings}
     />;
   }
 
