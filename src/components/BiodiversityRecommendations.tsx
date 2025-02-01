@@ -210,81 +210,100 @@ const BiodiversityRecommendations = ({
                 {recommendedMeasures
                   .sort((a, b) => calculateTotalPoints(b) - calculateTotalPoints(a))
                   .map((measure) => (
-                  <Card key={measure.id}>
-                    <CardHeader>
+                  <Card key={measure.id} className="overflow-hidden">
+                    <CardHeader className="pb-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <span className="text-2xl">{measure.emoji}</span>
                           <CardTitle className="text-lg">{measure.title}</CardTitle>
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-muted-foreground">
                           Total Points: {calculateTotalPoints(measure)}
                         </div>
                       </div>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <Progress value={(calculateTotalPoints(measure) / 15) * 100} className="h-2" />
-                      <div className="grid grid-cols-3 gap-2 text-sm">
-                        <div className="flex flex-col space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">Difficulty Points</span>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
-                              </TooltipTrigger>
-                              <TooltipContent side="top">
-                                <p className="max-w-xs">
-                                  Points awarded based on ease of implementation. Lower difficulty measures receive more points to encourage starting with simpler actions.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
+                    <CardContent className="space-y-6">
+                      <Progress 
+                        value={(calculateTotalPoints(measure) / 15) * 100} 
+                        className="h-2 bg-slate-100" 
+                      />
+                      
+                      <div className="grid grid-cols-3 gap-8">
+                        <div className="space-y-2">
+                          <div className="flex flex-col">
+                            <span className="font-medium flex items-center justify-between">
+                              Difficulty Points
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors ml-1" />
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p className="max-w-xs">
+                                    Points awarded based on ease of implementation. Lower difficulty measures receive more points.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                            <span className="text-2xl font-semibold">{5 - measure.difficulty}</span>
                           </div>
-                          <span>{5 - measure.difficulty}</span>
                         </div>
-                        <div className="flex flex-col space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">Impact Points</span>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
-                              </TooltipTrigger>
-                              <TooltipContent side="top">
-                                <p className="max-w-xs">
-                                  Points reflect the measure's potential positive effect on biodiversity. Higher points indicate greater benefits for local wildlife and ecosystem health.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
+                        
+                        <div className="space-y-2">
+                          <div className="flex flex-col">
+                            <span className="font-medium flex items-center justify-between">
+                              Impact Points
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors ml-1" />
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p className="max-w-xs">
+                                    Points reflect the measure's potential positive effect on biodiversity.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                            <span className="text-2xl font-semibold">{measure.impact}</span>
                           </div>
-                          <span>{measure.impact}</span>
                         </div>
-                        <div className="flex flex-col space-y-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium">Environment Points</span>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
-                              </TooltipTrigger>
-                              <TooltipContent side="top">
-                                <p className="max-w-xs">
-                                  {measure.scoreReasoning || "No specific reasoning available for this environment score."}
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
+                        
+                        <div className="space-y-2">
+                          <div className="flex flex-col">
+                            <span className="font-medium flex items-center justify-between">
+                              Environment Points
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors ml-1" />
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <p className="max-w-xs">
+                                    {measure.scoreReasoning || "No specific reasoning available for this environment score."}
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </span>
+                            <span className="text-2xl font-semibold">{measure.environmentScore || 0}</span>
                           </div>
-                          <span>{measure.environmentScore}</span>
                         </div>
                       </div>
-                      <p>{measure.description}</p>
+
+                      <p className="text-lg">{measure.description}</p>
+                      
                       <div className="flex flex-wrap gap-2">
                         {measure.benefits.split(", ").map((benefit) => (
-                          <Badge key={benefit} variant="secondary">
+                          <Badge 
+                            key={benefit} 
+                            variant="secondary"
+                            className="bg-slate-100 text-slate-900 hover:bg-slate-200"
+                          >
                             {benefit}
                           </Badge>
                         ))}
                       </div>
-                      <div className="bg-muted p-4 rounded-lg">
-                        <h4 className="font-medium mb-2">Implementation Tips</h4>
-                        <p className="text-sm">{measure.implementation}</p>
+
+                      <div className="bg-slate-50 p-6 rounded-lg space-y-2">
+                        <h4 className="font-semibold text-lg">Implementation Tips</h4>
+                        <p>{measure.implementation}</p>
                       </div>
                     </CardContent>
                   </Card>
