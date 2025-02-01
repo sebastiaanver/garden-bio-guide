@@ -54,6 +54,7 @@ Return a JSON object with these properties:
 4. impactScores: object mapping measure IDs to impact scores (1-5)
 5. difficultyReasonings: object mapping measure IDs to strings explaining the difficulty score
 6. impactReasonings: object mapping measure IDs to strings explaining the impact score
+7. environmentReasonings: object mapping measure IDs to strings explaining how well the measure fits the environment
 
 Example response format:
 {
@@ -70,11 +71,16 @@ Example response format:
     "1": "High impact as the garden lacks wildlife shelter",
     "2": "Maximum impact due to absence of native plants",
     "8": "Good impact for pollinators in sunny areas"
+  },
+  "environmentReasonings": {
+    "1": "Well-suited for the garden's current layout and conditions",
+    "2": "Perfect match for the existing soil and climate",
+    "8": "Good fit for the available sunny areas"
   }
 }
 
 Provide detailed, specific reasonings that reference the actual questionnaire responses.
-The response must be valid JSON.`;
+The response must be valid JSON with all reasonings as plain strings, not objects.`;
 
     const response = await openai.createChatCompletion({
       model: "gpt-4o",
@@ -98,14 +104,24 @@ The response must be valid JSON.`;
     const content = response.data.choices[0].message.content.trim();
     const result = JSON.parse(content);
     
-    // Validate response format
+    // Validate response format and ensure all reasonings are string values
     if (!Array.isArray(result.recommendations) || 
         !result.environmentScores || 
         !result.difficultyScores ||
         !result.impactScores ||
         !result.difficultyReasonings ||
-        !result.impactReasonings) {
+        !result.impactReasonings ||
+        !result.environmentReasonings) {
       throw new Error('Invalid response format from AI');
+    }
+
+    // Ensure all reasonings are strings
+    for (const id of result.recommendations) {
+      if (typeof result.difficultyReasonings[id] !== 'string' ||
+          typeof result.impactReasonings[id] !== 'string' ||
+          typeof result.environmentReasonings[id] !== 'string') {
+        throw new Error('Invalid reasoning format from AI');
+      }
     }
 
     return new Response(
