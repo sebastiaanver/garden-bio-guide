@@ -1,21 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
-import { Measure } from "./types";
+import { Measure, ReasoningType } from "./types";
 
 interface MeasureCardProps {
-  measure: Measure & {
-    difficultyReasoning?: string;
-    impactReasoning?: string;
-    environmentReasoning?: string;
-    environmentScore?: number;
-    difficultyScore?: number;
-    impactScore?: number;
-  };
+  measure: Measure;
   calculateTotalPoints: (measure: Measure) => number;
 }
+
+const getReasoning = (reasoning?: ReasoningType): string => {
+  if (!reasoning) return '';
+  if (typeof reasoning === 'string') return reasoning;
+  return reasoning.value;
+};
 
 const ScoreSection = ({ 
   label, 
@@ -24,7 +23,7 @@ const ScoreSection = ({
 }: { 
   label: string; 
   score: number; 
-  reasoning?: string;
+  reasoning?: ReasoningType;
 }) => (
   <div className="space-y-2">
     <div className="flex flex-col">
@@ -36,7 +35,7 @@ const ScoreSection = ({
               <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p className="max-w-xs">{reasoning}</p>
+              <p className="max-w-xs">{getReasoning(reasoning)}</p>
             </TooltipContent>
           </Tooltip>
         )}

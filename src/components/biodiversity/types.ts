@@ -7,8 +7,9 @@ export type Measure = {
   emoji: string;
   difficulty: number;
   impact: number;
-  impactReasoning?: string;
-  difficultyReasoning?: string;
+  impactReasoning?: string | { _type: string; value: string };
+  difficultyReasoning?: string | { _type: string; value: string };
+  environmentReasoning?: string | { _type: string; value: string };
   environmentScore?: number;
   difficultyScore?: number;
   impactScore?: number;
