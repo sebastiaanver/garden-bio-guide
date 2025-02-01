@@ -179,9 +179,9 @@ interface Props {
   environmentScores?: Record<number, number>;
   difficultyScores?: Record<number, number>;
   impactScores?: Record<number, number>;
-  difficultyReasonings?: Record<number, string>;
-  impactReasonings?: Record<number, string>;
-  environmentReasonings?: Record<number, string>;
+  difficultyReasonings?: Record<number, string | { _type: string; value: string }>;
+  impactReasonings?: Record<number, string | { _type: string; value: string }>;
+  environmentReasonings?: Record<number, string | { _type: string; value: string }>;
 }
 
 const BiodiversityRecommendations = ({ 
@@ -203,13 +203,20 @@ const BiodiversityRecommendations = ({
     environmentReasonings
   });
 
+  const getReasoningValue = (reasoning: string | { _type: string; value: string } | undefined): string | undefined => {
+    if (!reasoning) return undefined;
+    if (typeof reasoning === 'string') return reasoning;
+    if (typeof reasoning === 'object' && 'value' in reasoning) return reasoning.value;
+    return undefined;
+  };
+
   const recommendedMeasures = measures
     .filter(measure => recommendations.includes(measure.id))
     .map(measure => {
       const reasonings = {
-        difficultyReasoning: difficultyReasonings[measure.id],
-        impactReasoning: impactReasonings[measure.id],
-        environmentReasoning: environmentReasonings[measure.id]
+        difficultyReasoning: getReasoningValue(difficultyReasonings[measure.id]),
+        impactReasoning: getReasoningValue(impactReasonings[measure.id]),
+        environmentReasoning: getReasoningValue(environmentReasonings[measure.id])
       };
       
       console.log(`Processing measure ${measure.id} reasonings:`, reasonings);
@@ -219,9 +226,7 @@ const BiodiversityRecommendations = ({
         environmentScore: environmentScores[measure.id],
         difficultyScore: difficultyScores[measure.id],
         impactScore: impactScores[measure.id],
-        difficultyReasoning: typeof difficultyReasonings[measure.id] === 'string' ? difficultyReasonings[measure.id] : undefined,
-        impactReasoning: typeof impactReasonings[measure.id] === 'string' ? impactReasonings[measure.id] : undefined,
-        environmentReasoning: typeof environmentReasonings[measure.id] === 'string' ? environmentReasonings[measure.id] : undefined
+        ...reasonings
       };
     });
 
