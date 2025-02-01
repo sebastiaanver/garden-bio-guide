@@ -206,20 +206,22 @@ const BiodiversityRecommendations = ({
   const recommendedMeasures = measures
     .filter(measure => recommendations.includes(measure.id))
     .map(measure => {
-      console.log(`Processing measure ${measure.id}:`, {
+      const reasonings = {
         difficultyReasoning: difficultyReasonings[measure.id],
         impactReasoning: impactReasonings[measure.id],
         environmentReasoning: environmentReasonings[measure.id]
-      });
+      };
+      
+      console.log(`Processing measure ${measure.id} reasonings:`, reasonings);
 
       return {
         ...measure,
         environmentScore: environmentScores[measure.id],
         difficultyScore: difficultyScores[measure.id],
         impactScore: impactScores[measure.id],
-        difficultyReasoning: difficultyReasonings[measure.id],
-        impactReasoning: impactReasonings[measure.id],
-        environmentReasoning: environmentReasonings[measure.id]
+        difficultyReasoning: typeof difficultyReasonings[measure.id] === 'string' ? difficultyReasonings[measure.id] : undefined,
+        impactReasoning: typeof impactReasonings[measure.id] === 'string' ? impactReasonings[measure.id] : undefined,
+        environmentReasoning: typeof environmentReasonings[measure.id] === 'string' ? environmentReasonings[measure.id] : undefined
       };
     });
 
