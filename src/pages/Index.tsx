@@ -11,6 +11,8 @@ const Index = () => {
   const [images, setImages] = useState<File[]>([]);
   const [selectedOption, setSelectedOption] = useState<"questionnaire" | "upload" | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [recommendations, setRecommendations] = useState<number[]>([]);
+  const [skipQuestionnaire, setSkipQuestionnaire] = useState(false);
   const { toast } = useToast();
 
   const handleImagesSelected = (files: File[]) => {
@@ -31,7 +33,6 @@ const Index = () => {
     try {
       console.log('Starting image upload process...');
       
-      // Upload images to Supabase Storage
       const imageUrls = await Promise.all(
         images.map(async (image) => {
           const fileExt = image.name.split('.').pop();
@@ -53,7 +54,6 @@ const Index = () => {
 
           console.log('Upload successful:', data);
 
-          // Get the public URL for the uploaded file
           const { data: { publicUrl } } = supabase.storage
             .from('garden_images')
             .getPublicUrl(fileName);
@@ -64,7 +64,6 @@ const Index = () => {
 
       console.log('All image URLs:', imageUrls);
 
-      // Analyze images with edge function
       const { data, error } = await supabase.functions.invoke('analyze-garden-images', {
         body: { imageUrls }
       });
@@ -76,14 +75,13 @@ const Index = () => {
 
       console.log('Analysis results:', data);
 
-      // Automatically analyze the questionnaire with the AI-generated answers
-      const recommendations = await analyzeQuestionnaire(data.answers);
+      // Get recommendations from the AI-generated answers
+      const recommendedMeasures = await analyzeQuestionnaire(data.answers);
+      console.log('Generated recommendations:', recommendedMeasures);
       
-      // Update BiodiversityQuestionnaire component to show recommendations
-      setSelectedOption("questionnaire");
-      
-      // Pass the recommendations directly to BiodiversityQuestionnaire
-      return <BiodiversityQuestionnaire initialRecommendations={recommendations} skipQuestionnaire={true} />;
+      // Set the recommendations and skip flag
+      setRecommendations(recommendedMeasures);
+      setSkipQuestionnaire(true);
 
     } catch (error) {
       console.error('Error analyzing garden:', error);
@@ -146,29 +144,40 @@ const Index = () => {
             {selectedOption === "questionnaire" ? (
               <BiodiversityQuestionnaire />
             ) : (
-              <div className="space-y-6">
-                <ImageUpload onImagesSelected={handleImagesSelected} />
-                <Button
-                  onClick={analyzeGardenImages}
-                  className="w-full bg-garden-primary hover:bg-garden-secondary transition-colors"
-                  disabled={isAnalyzing}
-                >
-                  {isAnalyzing ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                      <span>Analyzing your garden...</span>
-                    </div>
-                  ) : (
-                    "Analyze Garden"
-                  )}
-                </Button>
-              </div>
+              <>
+                {!skipQuestionnaire ? (
+                  <div className="space-y-6">
+                    <ImageUpload onImagesSelected={handleImagesSelected} />
+                    <Button
+                      onClick={analyzeGardenImages}
+                      className="w-full bg-garden-primary hover:bg-garden-secondary transition-colors"
+                      disabled={isAnalyzing}
+                    >
+                      {isAnalyzing ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                          <span>Analyzing your garden...</span>
+                        </div>
+                      ) : (
+                        "Analyze Garden"
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <BiodiversityQuestionnaire 
+                    skipQuestionnaire={true} 
+                    initialRecommendations={recommendations}
+                  />
+                )}
+              </>
             )}
             <Button
               variant="outline"
               onClick={() => {
                 setSelectedOption(null);
                 setImages([]);
+                setSkipQuestionnaire(false);
+                setRecommendations([]);
               }}
               className="mt-4"
             >
