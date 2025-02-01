@@ -25,18 +25,17 @@ const BiodiversityQuestionnaire = ({
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendations, setRecommendations] = useState<number[]>([]);
   const [environmentScores, setEnvironmentScores] = useState<Record<number, number>>({});
+  const [scoreReasonings, setScoreReasonings] = useState<Record<number, string>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (skipQuestionnaire && initialRecommendations) {
       setRecommendations(initialRecommendations);
-      // Set default environment scores for initial recommendations
-      const defaultScores = initialRecommendations?.reduce((acc, id) => ({
+      setEnvironmentScores(initialRecommendations?.reduce((acc, id) => ({
         ...acc,
         [id]: 3
-      }), {}) || {};
-      setEnvironmentScores(defaultScores);
+      }), {}));
       setShowRecommendations(true);
     }
   }, [skipQuestionnaire, initialRecommendations]);
@@ -72,14 +71,17 @@ const BiodiversityQuestionnaire = ({
       if (result.error) {
         throw new Error(result.error);
       }
-      setRecommendations(result.recommendations);
-      setEnvironmentScores(result.environmentScores);
+      setRecommendations(result.data.recommendations);
+      setEnvironmentScores(result.data.environmentScores);
+      if (result.data.scoreReasonings) {
+        setScoreReasonings(result.data.scoreReasonings);
+      }
       setShowRecommendations(true);
     } catch (error) {
       console.error("Error analyzing questionnaire:", error);
       toast({
         title: "Analysis Error",
-        description: error.message || "There was an error analyzing your responses. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error analyzing your responses. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -152,6 +154,7 @@ const BiodiversityQuestionnaire = ({
     return <BiodiversityRecommendations 
       recommendations={recommendations}
       environmentScores={environmentScores}
+      scoreReasonings={scoreReasonings}
     />;
   }
 

@@ -1,9 +1,19 @@
 import { supabase } from "@/integrations/supabase/client";
-import { formatQuestionnaireForAnalysis } from './formatQuestionnaire';
+
+type AnalysisResult = {
+  recommendations: number[];
+  environmentScores: Record<number, number>;
+  scoreReasonings?: Record<number, string>;
+};
+
+type AnalysisResponse = {
+  data: AnalysisResult;
+  error: null | string;
+};
 
 export const analyzeQuestionnaire = async (
   answers: Record<string, string | string[]>
-): Promise<{ recommendations: number[], environmentScores: Record<number, number> }> => {
+): Promise<AnalysisResponse> => {
   try {
     console.log('Analyzing questionnaire responses:', answers);
     
@@ -15,19 +25,34 @@ export const analyzeQuestionnaire = async (
 
     if (error) {
       console.error('Error calling analyze-questionnaire function:', error);
-      throw error;
+      return {
+        error: error.message || 'Error analyzing questionnaire',
+        data: {
+          recommendations: [],
+          environmentScores: {},
+          scoreReasonings: {}
+        }
+      };
     }
 
     console.log('Analysis results:', data);
     return {
-      recommendations: data.recommendations,
-      environmentScores: data.environmentScores
+      error: null,
+      data: {
+        recommendations: data.recommendations,
+        environmentScores: data.environmentScores,
+        scoreReasonings: data.scoreReasonings
+      }
     };
   } catch (error) {
     console.error('Error in analyzeQuestionnaire:', error);
     return {
-      recommendations: [1, 2, 8, 15],
-      environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 }
+      error: error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: {
+        recommendations: [],
+        environmentScores: {},
+        scoreReasonings: {}
+      }
     };
   }
 };
