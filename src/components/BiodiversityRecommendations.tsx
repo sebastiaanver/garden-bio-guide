@@ -197,12 +197,6 @@ const BiodiversityRecommendations = ({
     return difficultyPoints + impactPoints + environmentPoints;
   };
 
-  const pointTypeDescriptions = {
-    difficulty: "Points awarded based on ease of implementation. Lower difficulty measures receive more points to encourage starting with simpler actions that can make an immediate impact.",
-    impact: "Points reflect the measure's potential positive effect on biodiversity. Higher points indicate greater benefits for local wildlife and ecosystem health.",
-    environment: "Points indicate how well this measure aligns with your specific environment and conditions, based on your questionnaire responses."
-  };
-
   return (
     <div className="space-y-6">
       <TooltipProvider delayDuration={50}>
@@ -240,7 +234,7 @@ const BiodiversityRecommendations = ({
                               </TooltipTrigger>
                               <TooltipContent side="top">
                                 <p className="max-w-xs">
-                                  {pointTypeDescriptions.difficulty}
+                                  Points awarded based on ease of implementation. Lower difficulty measures receive more points to encourage starting with simpler actions.
                                 </p>
                               </TooltipContent>
                             </Tooltip>
@@ -256,7 +250,7 @@ const BiodiversityRecommendations = ({
                               </TooltipTrigger>
                               <TooltipContent side="top">
                                 <p className="max-w-xs">
-                                  {measure.impactReasoning || pointTypeDescriptions.impact}
+                                  {measure.impactReasoning || "Points reflect the measure's potential positive effect on biodiversity. Higher points indicate greater benefits for local wildlife and ecosystem health."}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
@@ -272,7 +266,7 @@ const BiodiversityRecommendations = ({
                               </TooltipTrigger>
                               <TooltipContent side="top">
                                 <p className="max-w-xs">
-                                  {measure.scoreReasoning || pointTypeDescriptions.environment}
+                                  {measure.scoreReasoning || "Points indicate how well this measure aligns with your specific environment and conditions."}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
