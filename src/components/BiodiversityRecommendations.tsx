@@ -250,11 +250,11 @@ const BiodiversityRecommendations = ({
                         
                         <div className="space-y-2">
                           <div className="flex flex-col">
-                            <span className="font-medium flex items-center justify-between">
+                            <span className="font-medium flex items-center justify-center gap-2">
                               Impact Points
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors ml-1" />
+                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
                                   <p className="max-w-xs">
@@ -263,17 +263,17 @@ const BiodiversityRecommendations = ({
                                 </TooltipContent>
                               </Tooltip>
                             </span>
-                            <span className="text-2xl font-semibold">{measure.impact}</span>
+                            <span className="text-2xl font-semibold text-center">{measure.impact}</span>
                           </div>
                         </div>
                         
                         <div className="space-y-2">
                           <div className="flex flex-col">
-                            <span className="font-medium flex items-center justify-between">
+                            <span className="font-medium flex items-center justify-center gap-2">
                               Environment Points
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors ml-1" />
+                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
                                   <p className="max-w-xs">
@@ -282,7 +282,7 @@ const BiodiversityRecommendations = ({
                                 </TooltipContent>
                               </Tooltip>
                             </span>
-                            <span className="text-2xl font-semibold">{measure.environmentScore || 0}</span>
+                            <span className="text-2xl font-semibold text-center">{measure.environmentScore || 0}</span>
                           </div>
                         </div>
                       </div>
