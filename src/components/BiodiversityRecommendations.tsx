@@ -10,8 +10,8 @@ export type Measure = {
   benefits: string;
   implementation: string;
   emoji: string;
-  difficulty: number; // 1-5 scale
-  impact: number; // 1-5 scale
+  difficulty: number; // 1-5 scale, hardcoded
+  impact: number; // 1-5 scale, from LLM
   environmentScore?: number; // 1-5 scale, calculated based on questionnaire/analysis
 };
 
@@ -181,18 +181,14 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
       environmentScore: environmentScores[measure.id] || 3
     }));
 
-  const calculateTotalScore = (measure: Measure) => {
-    // Impact is weighted more heavily than difficulty (inverse) and environment score
-    const difficultyScore = 6 - measure.difficulty; // Invert difficulty so lower is better
-    const impactWeight = 0.5;
-    const difficultyWeight = 0.25;
-    const environmentWeight = 0.25;
+  const calculateTotalPoints = (measure: Measure) => {
+    // Convert difficulty to points (5 - difficulty means lower difficulty = more points)
+    const difficultyPoints = 5 - measure.difficulty;
+    const impactPoints = measure.impact;
+    const environmentPoints = measure.environmentScore || 3;
 
-    return (
-      (measure.impact * impactWeight) +
-      (difficultyScore * difficultyWeight) +
-      (measure.environmentScore! * environmentWeight)
-    ) * 20; // Scale to 0-100
+    // Sum up all points
+    return difficultyPoints + impactPoints + environmentPoints;
   };
 
   return (
@@ -205,7 +201,7 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
           <ScrollArea className="h-[600px] pr-4">
             <div className="space-y-6">
               {recommendedMeasures
-                .sort((a, b) => calculateTotalScore(b) - calculateTotalScore(a))
+                .sort((a, b) => calculateTotalPoints(b) - calculateTotalPoints(a))
                 .map((measure) => (
                 <Card key={measure.id}>
                   <CardHeader>
@@ -215,24 +211,24 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                         <CardTitle className="text-lg">{measure.title}</CardTitle>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Score: {Math.round(calculateTotalScore(measure))}%
+                        Total Points: {calculateTotalPoints(measure)}
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <Progress value={calculateTotalScore(measure)} className="h-2" />
+                    <Progress value={(calculateTotalPoints(measure) / 15) * 100} className="h-2" />
                     <div className="grid grid-cols-3 gap-2 text-sm">
                       <div className="flex flex-col">
-                        <span className="text-muted-foreground">Difficulty</span>
-                        <span className="font-medium">{measure.difficulty}/5</span>
+                        <span className="text-muted-foreground">Difficulty Points</span>
+                        <span className="font-medium">{5 - measure.difficulty}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-muted-foreground">Impact</span>
-                        <span className="font-medium">{measure.impact}/5</span>
+                        <span className="text-muted-foreground">Impact Points</span>
+                        <span className="font-medium">{measure.impact}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-muted-foreground">Suitability</span>
-                        <span className="font-medium">{measure.environmentScore}/5</span>
+                        <span className="text-muted-foreground">Environment Points</span>
+                        <span className="font-medium">{measure.environmentScore}</span>
                       </div>
                     </div>
                     <p>{measure.description}</p>
