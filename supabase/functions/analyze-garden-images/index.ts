@@ -15,6 +15,33 @@ serve(async (req) => {
     const { imageUrls } = await req.json();
     console.log('Analyzing garden images:', imageUrls);
 
+    // Validate image URLs
+    if (!imageUrls || !Array.isArray(imageUrls) || imageUrls.length === 0) {
+      console.error('Invalid or empty image URLs provided');
+      return new Response(
+        JSON.stringify({ error: 'No valid image URLs provided' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    // Verify each image URL is accessible before sending to OpenAI
+    try {
+      await Promise.all(imageUrls.map(async (url) => {
+        const response = await fetch(url, { method: 'HEAD' });
+        if (!response.ok) {
+          throw new Error(`Image URL not accessible: ${url}`);
+        }
+      }));
+    } catch (error) {
+      console.error('Error verifying image URLs:', error);
+      return new Response(
+        JSON.stringify({ error: 'One or more image URLs are not accessible', details: error.message }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    console.log('All image URLs verified, proceeding with OpenAI analysis');
+
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -106,7 +133,9 @@ serve(async (req) => {
 17. aspectsToImprove: Areas needing enhancement (array of strings)
     Possible values: ["wildlife_habitats", "plant_diversity", "water_retention", "reducing_pesticide", "encouraging_pollinators", "other"]
 
-Analyze the provided garden images and respond ONLY with a JSON object containing these fields. Do not include any markdown formatting or explanation text. The response should be a valid JSON object with exactly these keys and valid values from the options provided.`
+For each recommendation you make, also provide an impact score (1-5) and reasoning for that score.
+
+Analyze the provided garden images and respond ONLY with a JSON object containing these fields plus impact scores and reasoning. Do not include any markdown formatting or explanation text.`
           },
           {
             role: 'user',
@@ -143,7 +172,6 @@ Analyze the provided garden images and respond ONLY with a JSON object containin
       const content = data.choices[0].message.content;
       console.log('Content to parse:', content);
       
-      // Remove any potential markdown formatting
       const cleanContent = content.replace(/```json\n|\n```/g, '').trim();
       console.log('Cleaned content:', cleanContent);
       
