@@ -25,37 +25,6 @@ const Index = () => {
     setImages((prev) => [...prev, ...files]);
   };
 
-  const handleStart = () => {
-    if (!name.trim()) {
-      toast({
-        title: "Name required",
-        description: "Please enter your name to continue",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!postalCode || postalCode.length !== 6) {
-      toast({
-        title: "Invalid postal code",
-        description: "Please enter a valid postal code (e.g., 1234AB)",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!selectedOption) {
-      toast({
-        title: "Select an option",
-        description: "Please choose whether you want to fill out the questionnaire or upload photos",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setShowForm(false);
-  };
-
   const analyzeGardenImages = async () => {
     if (images.length === 0) {
       toast({
@@ -128,6 +97,37 @@ const Index = () => {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const handleStart = () => {
+    if (!name.trim()) {
+      toast({
+        title: "Name required",
+        description: "Please enter your name to continue",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!postalCode || postalCode.length !== 6) {
+      toast({
+        title: "Invalid postal code",
+        description: "Please enter a valid postal code (e.g., 1234AB)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedOption) {
+      toast({
+        title: "Select an option",
+        description: "Please choose whether you want to fill out the questionnaire or upload photos",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowForm(false);
   };
 
   if (!showForm && selectedOption === "upload") {
@@ -231,7 +231,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="max-w-md mx-auto space-y-6 bg-white p-8 rounded-lg shadow-sm">
+        <div className="max-w-4xl mx-auto space-y-6 bg-white p-8 rounded-lg shadow-sm">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -251,31 +251,46 @@ const Index = () => {
 
           <div className="space-y-4">
             <Label>Choose an option:</Label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Button
-                variant={selectedOption === "questionnaire" ? "default" : "outline"}
-                className={`p-4 h-auto flex flex-col items-center space-y-2 ${
-                  selectedOption === "questionnaire" ? "bg-garden-primary" : ""
-                }`}
-                onClick={() => setSelectedOption("questionnaire")}
-              >
-                <span>Fill Questionnaire</span>
-              </Button>
-              <Button
-                variant={selectedOption === "upload" ? "default" : "outline"}
-                className={`p-4 h-auto flex flex-col items-center space-y-2 ${
-                  selectedOption === "upload" ? "bg-garden-primary" : ""
-                }`}
-                onClick={() => setSelectedOption("upload")}
-              >
-                <span>Upload Photos</span>
-              </Button>
+            <div className="grid grid-cols-1 gap-8">
+              <div className="relative">
+                <Button
+                  variant={selectedOption === "questionnaire" ? "default" : "outline"}
+                  className={`w-full p-8 h-auto flex flex-col items-center space-y-4 ${
+                    selectedOption === "questionnaire" ? "bg-garden-primary" : ""
+                  }`}
+                  onClick={() => setSelectedOption("questionnaire")}
+                >
+                  <span className="text-xl font-semibold">Fill Questionnaire</span>
+                  <p className="text-sm opacity-80">
+                    Answer questions about your garden's features and management practices to receive personalized recommendations.
+                  </p>
+                </Button>
+              </div>
+
+              <div className="text-center text-xl font-semibold text-gray-500">
+                OR
+              </div>
+
+              <div className="relative">
+                <Button
+                  variant={selectedOption === "upload" ? "default" : "outline"}
+                  className={`w-full p-8 h-auto flex flex-col items-center space-y-4 ${
+                    selectedOption === "upload" ? "bg-garden-primary" : ""
+                  }`}
+                  onClick={() => setSelectedOption("upload")}
+                >
+                  <span className="text-xl font-semibold">Upload Photos</span>
+                  <p className="text-sm opacity-80">
+                    Upload photos of your garden and let our AI analyze them to provide tailored biodiversity recommendations.
+                  </p>
+                </Button>
+              </div>
             </div>
           </div>
 
           <Button
             onClick={handleStart}
-            className="w-full bg-garden-primary hover:bg-garden-secondary transition-colors"
+            className="w-full bg-garden-primary hover:bg-garden-secondary transition-colors mt-8"
           >
             Start
           </Button>
