@@ -17,6 +17,8 @@ export type Measure = {
   impactReasoning?: string;
   difficultyReasoning?: string;
   environmentScore?: number;
+  difficultyScore?: number;
+  impactScore?: number;
 };
 
 const measures: Measure[] = [
@@ -175,6 +177,8 @@ const measures: Measure[] = [
 interface Props {
   recommendations: number[];
   environmentScores?: Record<number, number>;
+  difficultyScores?: Record<number, number>;
+  impactScores?: Record<number, number>;
   difficultyReasonings?: Record<number, string>;
   impactReasonings?: Record<number, string>;
 }
@@ -182,6 +186,8 @@ interface Props {
 const BiodiversityRecommendations = ({ 
   recommendations, 
   environmentScores = {}, 
+  difficultyScores = {},
+  impactScores = {},
   difficultyReasonings = {},
   impactReasonings = {}
 }: Props) => {
@@ -190,13 +196,15 @@ const BiodiversityRecommendations = ({
     .map(measure => ({
       ...measure,
       environmentScore: environmentScores[measure.id],
+      difficultyScore: difficultyScores[measure.id],
+      impactScore: impactScores[measure.id],
       difficultyReasoning: difficultyReasonings[measure.id],
       impactReasoning: impactReasonings[measure.id]
     }));
 
   const calculateTotalPoints = (measure: Measure & { difficultyReasoning?: string; impactReasoning?: string }) => {
-    const difficultyPoints = 5 - measure.difficulty;
-    const impactPoints = measure.impact;
+    const difficultyPoints = measure.difficultyScore || (5 - measure.difficulty);
+    const impactPoints = measure.impactScore || measure.impact;
     const environmentPoints = measure.environmentScore || 0;
     return difficultyPoints + impactPoints + environmentPoints;
   };
@@ -248,7 +256,9 @@ const BiodiversityRecommendations = ({
                                 </TooltipContent>
                               </Tooltip>
                             </span>
-                            <span className="text-2xl font-semibold text-center">{5 - measure.difficulty}</span>
+                            <span className="text-2xl font-semibold text-center">
+                              {measure.difficultyScore || (5 - measure.difficulty)}
+                            </span>
                           </div>
                         </div>
                         
@@ -267,7 +277,9 @@ const BiodiversityRecommendations = ({
                                 </TooltipContent>
                               </Tooltip>
                             </span>
-                            <span className="text-2xl font-semibold text-center">{measure.impact}</span>
+                            <span className="text-2xl font-semibold text-center">
+                              {measure.impactScore || measure.impact}
+                            </span>
                           </div>
                         </div>
                         

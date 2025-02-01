@@ -4,6 +4,8 @@ import { formatQuestionnaireForAnalysis } from './formatQuestionnaire';
 type AnalysisResult = {
   recommendations: number[];
   environmentScores: Record<number, number>;
+  difficultyScores: Record<number, number>;
+  impactScores: Record<number, number>;
   difficultyReasonings?: Record<number, string>;
   impactReasonings?: Record<number, string>;
 };
@@ -32,6 +34,8 @@ export const analyzeQuestionnaire = async (
         data: {
           recommendations: [],
           environmentScores: {},
+          difficultyScores: {},
+          impactScores: {},
           difficultyReasonings: {},
           impactReasonings: {}
         }
@@ -44,6 +48,8 @@ export const analyzeQuestionnaire = async (
       data: {
         recommendations: data.recommendations,
         environmentScores: data.environmentScores,
+        difficultyScores: data.difficultyScores,
+        impactScores: data.impactScores,
         difficultyReasonings: data.difficultyReasonings,
         impactReasonings: data.impactReasonings
       }
@@ -55,6 +61,8 @@ export const analyzeQuestionnaire = async (
       data: {
         recommendations: [],
         environmentScores: {},
+        difficultyScores: {},
+        impactScores: {},
         difficultyReasonings: {},
         impactReasonings: {}
       }

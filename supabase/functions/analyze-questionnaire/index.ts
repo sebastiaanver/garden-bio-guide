@@ -22,9 +22,10 @@ serve(async (req) => {
     const openai = new OpenAIApi(configuration);
 
     const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. For each recommended measure, provide:
-1. A difficulty score (1-5) indicating how challenging it would be to implement in this specific garden context
-2. An impact score (1-5) indicating the potential positive effect on biodiversity for this specific garden
-3. Clear reasoning for both scores based on the questionnaire responses
+1. An environment score (1-5) indicating how well the measure fits the specific garden context
+2. A difficulty score (1-5) indicating how challenging it would be to implement in this specific garden
+3. An impact score (1-5) indicating the potential positive effect on biodiversity for this specific garden
+4. Clear reasoning for all scores based on the questionnaire responses
 
 Questionnaire Responses:
 ${JSON.stringify(answers, null, 2)}
@@ -49,22 +50,26 @@ Available measures:
 Return a JSON object with these properties:
 1. recommendations: array of recommended measure IDs (numbers 1-15)
 2. environmentScores: object mapping measure IDs to environment scores (1-5)
-3. difficultyReasonings: object mapping measure IDs to strings explaining why the difficulty score was given
-4. impactReasonings: object mapping measure IDs to strings explaining why the impact score was given
+3. difficultyScores: object mapping measure IDs to difficulty scores (1-5)
+4. impactScores: object mapping measure IDs to impact scores (1-5)
+5. difficultyReasonings: object mapping measure IDs to strings explaining the difficulty score
+6. impactReasonings: object mapping measure IDs to strings explaining the impact score
 
 Example response format:
 {
   "recommendations": [1, 2, 8],
   "environmentScores": {"1": 4, "2": 5, "8": 3},
+  "difficultyScores": {"1": 2, "2": 3, "8": 2},
+  "impactScores": {"1": 4, "2": 5, "8": 4},
   "difficultyReasonings": {
-    "1": "Easy to implement given the sheltered area mentioned in the garden",
+    "1": "Easy to implement given the sheltered area mentioned",
     "2": "Moderate difficulty due to soil preparation needs",
     "8": "Simple to implement along existing borders"
   },
   "impactReasonings": {
-    "1": "High impact as the garden lacks wildlife shelter currently",
-    "2": "Maximum impact due to the absence of native plants",
-    "8": "Good impact for pollinators in the sunny areas"
+    "1": "High impact as the garden lacks wildlife shelter",
+    "2": "Maximum impact due to absence of native plants",
+    "8": "Good impact for pollinators in sunny areas"
   }
 }
 
@@ -76,7 +81,7 @@ The response must be valid JSON.`;
       messages: [
         {
           role: "system",
-          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, scores, and specific reasoning based on the provided responses. Your response must be in JSON format."
+          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, scores, and specific reasoning based on the provided responses."
         },
         { role: "user", content: prompt }
       ],
@@ -96,6 +101,8 @@ The response must be valid JSON.`;
     // Validate response format
     if (!Array.isArray(result.recommendations) || 
         !result.environmentScores || 
+        !result.difficultyScores ||
+        !result.impactScores ||
         !result.difficultyReasonings ||
         !result.impactReasonings) {
       throw new Error('Invalid response format from AI');
