@@ -32,36 +32,49 @@ const Index = () => {
       const imageUrls = await Promise.all(
         images.map(async (image) => {
           const fileExt = image.name.split('.').pop();
-          const filePath = `${crypto.randomUUID()}.${fileExt}`;
+          const fileName = `${crypto.randomUUID()}.${fileExt}`;
           
-          const { data, error } = await supabase.storage
+          console.log('Attempting to upload file:', fileName);
+          
+          const { data, error: uploadError } = await supabase.storage
             .from('garden_images')
-            .upload(filePath, image);
+            .upload(fileName, image, {
+              cacheControl: '3600',
+              upsert: false
+            });
 
-          if (error) throw error;
+          if (uploadError) {
+            console.error('Upload error:', uploadError);
+            throw uploadError;
+          }
 
+          console.log('Upload successful:', data);
+
+          // Get the public URL for the uploaded file
           const { data: { publicUrl } } = supabase.storage
             .from('garden_images')
-            .getPublicUrl(filePath);
+            .getPublicUrl(fileName);
 
           return publicUrl;
         })
       );
 
-      console.log('Uploaded image URLs:', imageUrls);
+      console.log('All image URLs:', imageUrls);
 
-      // Analyze images with GPT-4o
+      // Analyze images with edge function
       const { data, error } = await supabase.functions.invoke('analyze-garden-images', {
         body: { imageUrls }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Analysis error:', error);
+        throw error;
+      }
 
       console.log('Analysis results:', data);
 
       // Pass the answers to BiodiversityQuestionnaire
       setSelectedOption("questionnaire");
-      // The questionnaire component will handle the answers and show recommendations
     } catch (error) {
       console.error('Error analyzing garden:', error);
       toast({
