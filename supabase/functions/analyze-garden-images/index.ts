@@ -26,27 +26,87 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a garden biodiversity expert analyzing garden images. Respond ONLY with a JSON object containing questionnaire answers. Do not include any markdown formatting, explanation text, or code blocks. The response should be a valid JSON object with these exact keys and valid values from the questionnaire options:
+            content: `You are a garden biodiversity expert analyzing garden images. Your task is to assess various aspects of the garden's biodiversity and management practices. Here's what each field means:
 
-{
-  "landSize": "small" | "medium" | "large",
-  "landUse": "private_garden" | "agricultural" | "mixed",
-  "currentMeasures": "yes" | "no" | "not_sure",
-  "vegetationTypes": string[],
-  "nativeSpecies": "mostly_native" | "mixed" | "mostly_non_native",
-  "vegetationHeight": "diverse" | "some_variation" | "uniform",
-  "wildlifeFeatures": string[],
-  "waterFeatures": "natural_pond" | "man_made_pond" | "no_water",
-  "foodSources": "year_round" | "seasonally" | "no",
-  "grassManagement": "mow_regularly" | "leave_uncut" | "rotational_mowing",
-  "chemicalUse": "frequently" | "occasionally" | "natural_methods",
-  "soilHealth": "compost" | "chemical_fertilizers" | "no_management",
-  "landConnectivity": "well_connected" | "somewhat_connected" | "isolated",
-  "wildlifeBarriers": "many_barriers" | "some_barriers" | "accessible",
-  "sustainableUse": "yes" | "no",
-  "improvements": "actively_looking" | "maybe" | "satisfied",
-  "aspectsToImprove": string[]
-}`
+1. landSize: Approximate size of the land
+   - "small": Less than 500 m²
+   - "medium": 500 m² - 2000 m²
+   - "large": More than 2000 m²
+
+2. landUse: Main purpose of the land
+   - "private_garden": Residential garden
+   - "agricultural": Farming/cultivation
+   - "mixed": Combined garden and small-scale farming
+
+3. currentMeasures: Whether biodiversity promotion measures are visible
+   - "yes": Clear evidence of biodiversity measures
+   - "no": No visible biodiversity measures
+   - "not_sure": Unclear from images
+
+4. vegetationTypes: Types of plants present (array of strings)
+   Possible values: ["lawn", "wildflower", "native_trees", "exotic", "vegetables", "other"]
+
+5. nativeSpecies: Presence of native plant species
+   - "mostly_native": Predominantly native plants
+   - "mixed": Mix of native and non-native
+   - "mostly_non_native": Mainly non-native species
+
+6. vegetationHeight: Vertical diversity of vegetation
+   - "diverse": Multiple distinct layers
+   - "some_variation": Some height differences
+   - "uniform": Mostly single-level vegetation
+
+7. wildlifeFeatures: Wildlife-supporting structures (array of strings)
+   Possible values: ["hedgehog_house", "birdhouses", "bat_boxes", "bee_hotel", "log_piles", "none"]
+
+8. waterFeatures: Presence of water bodies
+   - "natural_pond": Natural water feature
+   - "man_made_pond": Artificial pond/water feature
+   - "no_water": No visible water features
+
+9. foodSources: Availability of wildlife food
+   - "year_round": Constant food sources
+   - "seasonally": Seasonal food availability
+   - "no": No visible food sources
+
+10. grassManagement: Lawn maintenance approach
+    - "mow_regularly": Frequently mowed
+    - "leave_uncut": Some areas left natural
+    - "rotational_mowing": Varied mowing patterns
+
+11. chemicalUse: Use of chemical treatments
+    - "frequently": Regular chemical use evident
+    - "occasionally": Some chemical use
+    - "natural_methods": Natural/organic approach
+
+12. soilHealth: Soil management practices
+    - "compost": Organic matter/composting visible
+    - "chemical_fertilizers": Chemical fertilizer use
+    - "no_management": No visible soil management
+
+13. landConnectivity: Connection to other natural areas
+    - "well_connected": Links to other green spaces
+    - "somewhat_connected": Partial connectivity
+    - "isolated": No visible connections
+
+14. wildlifeBarriers: Obstacles to wildlife movement
+    - "many_barriers": Significant barriers
+    - "some_barriers": Some passable barriers
+    - "accessible": Few/no barriers
+
+15. sustainableUse: Sustainable practices visible
+    - "yes": Clear sustainable practices
+    - "no": No visible sustainable practices
+
+16. improvements: Potential for biodiversity enhancement
+    - "actively_looking": Clear room for improvement
+    - "maybe": Some potential improvements
+    - "satisfied": Already well-optimized
+
+17. aspectsToImprove: Areas needing enhancement (array of strings)
+    Possible values: ["wildlife_habitats", "plant_diversity", "water_retention", "reducing_pesticide", "encouraging_pollinators", "other"]
+
+Analyze the provided garden images and respond ONLY with a JSON object containing these fields. Do not include any markdown formatting or explanation text. The response should be a valid JSON object with exactly these keys and valid values from the options provided.`
           },
           {
             role: 'user',
@@ -99,7 +159,7 @@ serve(async (req) => {
       console.log('Raw content that failed to parse:', data.choices[0].message.content);
       return new Response(
         JSON.stringify({ 
-          error: 'Failed to parse OpenAI response',
+          error: 'Failed to parse OpenAI response as JSON',
           details: parseError.message,
           content: data.choices[0].message.content 
         }),
