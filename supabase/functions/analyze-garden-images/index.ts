@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -40,18 +39,32 @@ serve(async (req) => {
           },
           {
             role: 'user',
-            content: imageUrls.map(url => ({ type: "image_url", image_url: url }))
+            content: [
+              ...imageUrls.map(url => ({
+                type: "image_url",
+                image_url: {
+                  url: url,
+                  detail: "high"
+                }
+              }))
+            ]
           }
         ],
         max_tokens: 1000,
       }),
     });
 
+    if (!openAIResponse.ok) {
+      const errorData = await openAIResponse.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${JSON.stringify(errorData)}`);
+    }
+
     const data = await openAIResponse.json();
     console.log('OpenAI response:', data);
 
     if (!data.choices?.[0]?.message?.content) {
-      throw new Error('Invalid response from OpenAI');
+      throw new Error('Invalid response format from OpenAI');
     }
 
     // Parse the questionnaire answers
@@ -65,8 +78,14 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in analyze-garden-images function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({ 
+        error: error.message,
+        details: error.toString()
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 500 
+      }
     );
   }
 });
