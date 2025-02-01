@@ -17,7 +17,9 @@ serve(async (req) => {
     const { answers } = await req.json();
     console.log('Received answers:', answers);
 
-    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures and provide environment scores for each recommended measure (1-5 scale, where 5 means perfect fit for the environment).
+    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. For each recommended measure:
+1. Provide an impact score (1-5 scale, where 5 is highest impact)
+2. Provide a brief explanation of why you assigned that impact score
 
 Questionnaire Responses:
 ${JSON.stringify(answers, null, 2)}
@@ -39,9 +41,12 @@ Available measures:
 14 = Birdhouses
 15 = Bee Hotels
 
-Return a JSON object with two properties:
+Return a JSON object with three properties:
 1. recommendations: array of recommended measure IDs
 2. environmentScores: object mapping measure IDs to environment scores (1-5)
+3. impactReasonings: object mapping measure IDs to objects containing:
+   - score: impact score (1-5)
+   - reasoning: brief explanation for the score
 
 Example response:
 {
@@ -51,6 +56,16 @@ Example response:
     "4": 3,
     "8": 5,
     "15": 4
+  },
+  "impactReasonings": {
+    "1": {
+      "score": 4,
+      "reasoning": "Hedgehogs are excellent natural pest controllers and their presence indicates a healthy ecosystem"
+    },
+    "4": {
+      "score": 5,
+      "reasoning": "A pond provides essential habitat for amphibians and insects, significantly boosting biodiversity"
+    }
   }
 }`;
 
@@ -65,7 +80,7 @@ Example response:
         messages: [
           {
             role: 'system',
-            content: 'You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations and environment scores.'
+            content: 'You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, environment scores, and impact reasonings.'
           },
           { role: 'user', content: prompt }
         ],
@@ -85,11 +100,11 @@ Example response:
       const content = data.choices[0].message.content.trim();
       result = JSON.parse(content);
       
-      if (!Array.isArray(result.recommendations) || !result.environmentScores) {
+      if (!Array.isArray(result.recommendations) || !result.environmentScores || !result.impactReasonings) {
         throw new Error('Invalid response format');
       }
       
-      // Validate recommendations and scores
+      // Validate and clean up the response
       result.recommendations = result.recommendations.filter(id => 
         typeof id === 'number' && id >= 1 && id <= 15
       );
@@ -108,7 +123,13 @@ Example response:
       console.error('Error parsing OpenAI response:', error);
       result = {
         recommendations: [1, 2, 8, 15],
-        environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 }
+        environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 },
+        impactReasonings: {
+          "1": { score: 4, reasoning: "Provides shelter for beneficial wildlife" },
+          "2": { score: 5, reasoning: "Foundation for biodiversity" },
+          "8": { score: 4, reasoning: "Supports essential pollinators" },
+          "15": { score: 5, reasoning: "Critical for wild bee populations" }
+        }
       };
     }
 
@@ -124,6 +145,12 @@ Example response:
       JSON.stringify({ 
         recommendations: [1, 2, 8, 15],
         environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 },
+        impactReasonings: {
+          "1": { score: 4, reasoning: "Provides shelter for beneficial wildlife" },
+          "2": { score: 5, reasoning: "Foundation for biodiversity" },
+          "8": { score: 4, reasoning: "Supports essential pollinators" },
+          "15": { score: 5, reasoning: "Critical for wild bee populations" }
+        },
         error: error.message 
       }),
       {

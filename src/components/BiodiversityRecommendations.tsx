@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 export type Measure = {
   id: number;
@@ -12,6 +14,7 @@ export type Measure = {
   emoji: string;
   difficulty: number; // 1-5 scale, hardcoded
   impact: number; // 1-5 scale, from LLM
+  impactReasoning?: string; // Reasoning from LLM for the impact score
   environmentScore?: number; // 1-5 scale, calculated based on questionnaire/analysis
 };
 
@@ -182,12 +185,9 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
     }));
 
   const calculateTotalPoints = (measure: Measure) => {
-    // Convert difficulty to points (5 - difficulty means lower difficulty = more points)
     const difficultyPoints = 5 - measure.difficulty;
     const impactPoints = measure.impact;
     const environmentPoints = measure.environmentScore || 3;
-
-    // Sum up all points
     return difficultyPoints + impactPoints + environmentPoints;
   };
 
@@ -219,15 +219,57 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                     <Progress value={(calculateTotalPoints(measure) / 15) * 100} className="h-2" />
                     <div className="grid grid-cols-3 gap-2 text-sm">
                       <div className="flex flex-col">
-                        <span className="text-muted-foreground">Difficulty Points</span>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-muted-foreground">Difficulty Points</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs">
+                                  Based on the complexity of implementation. Lower difficulty means more points.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                         <span className="font-medium">{5 - measure.difficulty}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-muted-foreground">Impact Points</span>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-muted-foreground">Impact Points</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs">
+                                  {measure.impactReasoning || "Based on the measure's potential impact on biodiversity."}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                         <span className="font-medium">{measure.impact}</span>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-muted-foreground">Environment Points</span>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-muted-foreground">Environment Points</span>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info className="h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs">
+                                  Score based on how well this measure suits your specific environment.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                         <span className="font-medium">{measure.environmentScore}</span>
                       </div>
                     </div>
