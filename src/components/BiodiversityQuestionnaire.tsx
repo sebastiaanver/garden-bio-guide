@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { questionnaireSections } from "@/data/questionnaire";
 import { Question } from "@/types/questionnaire";
+import { analyzeQuestionnaire } from "@/utils/analyzeQuestionnaire";
+import BiodiversityRecommendations from "./BiodiversityRecommendations";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const BiodiversityQuestionnaire = () => {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
-  const [currentSection, setCurrentSection] = useState(0);
   const [customAnswers, setCustomAnswers] = useState<Record<string, string>>({});
+  const [currentSection, setCurrentSection] = useState(0);
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [recommendations, setRecommendations] = useState<number[]>([]);
 
   const handleSingleAnswer = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -33,6 +36,17 @@ const BiodiversityQuestionnaire = () => {
   const handleCustomAnswer = (questionId: string, value: string) => {
     setCustomAnswers((prev) => ({ ...prev, [questionId]: value }));
   };
+
+  const handleSubmit = () => {
+    console.log("Final answers:", { answers, customAnswers });
+    const recommendedMeasures = analyzeQuestionnaire(answers);
+    setRecommendations(recommendedMeasures);
+    setShowRecommendations(true);
+  };
+
+  if (showRecommendations) {
+    return <BiodiversityRecommendations recommendations={recommendations} />;
+  }
 
   const renderQuestion = (question: Question) => {
     if (question.type === "single") {
@@ -123,7 +137,7 @@ const BiodiversityQuestionnaire = () => {
                 if (currentSection < questionnaireSections.length - 1) {
                   setCurrentSection((prev) => prev + 1);
                 } else {
-                  console.log("Final answers:", { answers, customAnswers });
+                  handleSubmit();
                 }
               }}
             >
