@@ -193,17 +193,35 @@ const BiodiversityRecommendations = ({
   impactReasonings = {},
   environmentReasonings = {}
 }: Props) => {
+  console.log('Received props:', {
+    recommendations,
+    environmentScores,
+    difficultyScores,
+    impactScores,
+    difficultyReasonings,
+    impactReasonings,
+    environmentReasonings
+  });
+
   const recommendedMeasures = measures
     .filter(measure => recommendations.includes(measure.id))
-    .map(measure => ({
-      ...measure,
-      environmentScore: environmentScores[measure.id],
-      difficultyScore: difficultyScores[measure.id],
-      impactScore: impactScores[measure.id],
-      difficultyReasoning: difficultyReasonings[measure.id],
-      impactReasoning: impactReasonings[measure.id],
-      environmentReasoning: environmentReasonings[measure.id]
-    }));
+    .map(measure => {
+      console.log(`Processing measure ${measure.id}:`, {
+        difficultyReasoning: difficultyReasonings[measure.id],
+        impactReasoning: impactReasonings[measure.id],
+        environmentReasoning: environmentReasonings[measure.id]
+      });
+
+      return {
+        ...measure,
+        environmentScore: environmentScores[measure.id],
+        difficultyScore: difficultyScores[measure.id],
+        impactScore: impactScores[measure.id],
+        difficultyReasoning: difficultyReasonings[measure.id],
+        impactReasoning: impactReasonings[measure.id],
+        environmentReasoning: environmentReasonings[measure.id]
+      };
+    });
 
   const calculateTotalPoints = (measure: Measure & { difficultyReasoning?: string; impactReasoning?: string }) => {
     const difficultyPoints = measure.difficultyScore || (5 - measure.difficulty);
@@ -224,109 +242,119 @@ const BiodiversityRecommendations = ({
               <div className="space-y-6">
                 {recommendedMeasures
                   .sort((a, b) => calculateTotalPoints(b) - calculateTotalPoints(a))
-                  .map((measure) => (
-                  <Card key={measure.id} className="overflow-hidden">
-                    <CardHeader className="pb-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-2xl">{measure.emoji}</span>
-                          <CardTitle className="text-lg">{measure.title}</CardTitle>
-                        </div>
-                        <div className="text-muted-foreground">
-                          Total Points: {calculateTotalPoints(measure)}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <Progress 
-                        value={(calculateTotalPoints(measure) / 15) * 100} 
-                        className="h-2 bg-slate-100" 
-                      />
-                      
-                      <div className="grid grid-cols-3 gap-8">
-                        <div className="space-y-2">
-                          <div className="flex flex-col">
-                            <span className="font-medium flex items-center justify-center gap-2">
-                              Difficulty Points
-                              {measure.difficultyReasoning && (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top">
-                                    <p className="max-w-xs">{measure.difficultyReasoning}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                            </span>
-                            <span className="text-2xl font-semibold text-center">
-                              {measure.difficultyScore || (5 - measure.difficulty)}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex flex-col">
-                            <span className="font-medium flex items-center justify-center gap-2">
-                              Impact Points
-                              {measure.impactReasoning && (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top">
-                                    <p className="max-w-xs">{measure.impactReasoning}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                            </span>
-                            <span className="text-2xl font-semibold text-center">
-                              {measure.impactScore || measure.impact}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex flex-col">
-                            <span className="font-medium flex items-center justify-center gap-2">
-                              Environment Points
-                              {measure.environmentReasoning && (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top">
-                                    <p className="max-w-xs">{measure.environmentReasoning}</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                            </span>
-                            <span className="text-2xl font-semibold text-center">{measure.environmentScore || 0}</span>
-                          </div>
-                        </div>
-                      </div>
+                  .map((measure) => {
+                    console.log(`Rendering measure ${measure.id} with reasonings:`, {
+                      difficultyReasoning: measure.difficultyReasoning,
+                      impactReasoning: measure.impactReasoning,
+                      environmentReasoning: measure.environmentReasoning
+                    });
 
-                      <p className="text-lg">{measure.description}</p>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        {measure.benefits.split(", ").map((benefit) => (
-                          <Badge 
-                            key={benefit} 
-                            variant="secondary"
-                            className="bg-slate-100 text-slate-900 hover:bg-slate-200"
-                          >
-                            {benefit}
-                          </Badge>
-                        ))}
-                      </div>
+                    return (
+                      <Card key={measure.id} className="overflow-hidden">
+                        <CardHeader className="pb-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-2xl">{measure.emoji}</span>
+                              <CardTitle className="text-lg">{measure.title}</CardTitle>
+                            </div>
+                            <div className="text-muted-foreground">
+                              Total Points: {calculateTotalPoints(measure)}
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                          <Progress 
+                            value={(calculateTotalPoints(measure) / 15) * 100} 
+                            className="h-2 bg-slate-100" 
+                          />
+                          
+                          <div className="grid grid-cols-3 gap-8">
+                            <div className="space-y-2">
+                              <div className="flex flex-col">
+                                <span className="font-medium flex items-center justify-center gap-2">
+                                  Difficulty Points
+                                  {measure.difficultyReasoning && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
+                                      </TooltipTrigger>
+                                      <TooltipContent side="top">
+                                        <p className="max-w-xs">{measure.difficultyReasoning}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                </span>
+                                <span className="text-2xl font-semibold text-center">
+                                  {measure.difficultyScore || (5 - measure.difficulty)}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="flex flex-col">
+                                <span className="font-medium flex items-center justify-center gap-2">
+                                  Impact Points
+                                  {measure.impactReasoning && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
+                                      </TooltipTrigger>
+                                      <TooltipContent side="top">
+                                        <p className="max-w-xs">{measure.impactReasoning}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                </span>
+                                <span className="text-2xl font-semibold text-center">
+                                  {measure.impactScore || measure.impact}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="flex flex-col">
+                                <span className="font-medium flex items-center justify-center gap-2">
+                                  Environment Points
+                                  {measure.environmentReasoning && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
+                                      </TooltipTrigger>
+                                      <TooltipContent side="top">
+                                        <p className="max-w-xs">{measure.environmentReasoning}</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                </span>
+                                <span className="text-2xl font-semibold text-center">
+                                  {measure.environmentScore || 0}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
 
-                      <div className="bg-slate-50 p-6 rounded-lg space-y-2">
-                        <h4 className="font-semibold text-lg">Implementation Tips</h4>
-                        <p>{measure.implementation}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                          <p className="text-lg">{measure.description}</p>
+                          
+                          <div className="flex flex-wrap gap-2">
+                            {measure.benefits.split(", ").map((benefit) => (
+                              <Badge 
+                                key={benefit} 
+                                variant="secondary"
+                                className="bg-slate-100 text-slate-900 hover:bg-slate-200"
+                              >
+                                {benefit}
+                              </Badge>
+                            ))}
+                          </div>
+
+                          <div className="bg-slate-50 p-6 rounded-lg space-y-2">
+                            <h4 className="font-semibold text-lg">Implementation Tips</h4>
+                            <p>{measure.implementation}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
               </div>
             </ScrollArea>
           </CardContent>
