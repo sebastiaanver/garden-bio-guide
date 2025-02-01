@@ -25,7 +25,7 @@ const BiodiversityRecommendations = ({
   });
 
   const calculateTotalPoints = (measure: Measure) => {
-    const difficultyPoints = measure.difficultyScore || (5 - measure.difficulty);
+    const difficultyPoints = measure.difficultyScore || (10 - measure.difficulty);
     const impactPoints = measure.impactScore || measure.impact;
     const environmentPoints = measure.environmentScore || 0;
     return difficultyPoints + impactPoints + environmentPoints;

@@ -49,7 +49,7 @@ const ScoreSection = ({
 
 const MeasureCard = ({ measure, calculateTotalPoints }: MeasureCardProps) => {
   const totalPoints = calculateTotalPoints(measure);
-  const difficultyPoints = measure.difficultyScore || (5 - measure.difficulty);
+  const difficultyPoints = measure.difficultyScore || (10 - measure.difficulty);
   const impactPoints = measure.impactScore || measure.impact;
   const environmentPoints = measure.environmentScore || 0;
 
