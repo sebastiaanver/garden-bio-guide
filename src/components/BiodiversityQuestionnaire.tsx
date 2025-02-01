@@ -7,6 +7,7 @@ import { Question } from "@/types/questionnaire";
 import { analyzeQuestionnaire } from "@/utils/analyzeQuestionnaire";
 import BiodiversityRecommendations from "./BiodiversityRecommendations";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/components/ui/use-toast";
 
 const BiodiversityQuestionnaire = () => {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -14,6 +15,8 @@ const BiodiversityQuestionnaire = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendations, setRecommendations] = useState<number[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const { toast } = useToast();
 
   const handleSingleAnswer = (questionId: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
@@ -37,11 +40,26 @@ const BiodiversityQuestionnaire = () => {
     setCustomAnswers((prev) => ({ ...prev, [questionId]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("Final answers:", { answers, customAnswers });
-    const recommendedMeasures = analyzeQuestionnaire(answers);
-    setRecommendations(recommendedMeasures);
-    setShowRecommendations(true);
+    setIsAnalyzing(true);
+    
+    try {
+      const recommendedMeasures = await analyzeQuestionnaire(answers);
+      setRecommendations(recommendedMeasures);
+      setShowRecommendations(true);
+    } catch (error) {
+      console.error("Error analyzing questionnaire:", error);
+      toast({
+        title: "Analysis Error",
+        description: "There was an error analyzing your responses. Using default recommendations instead.",
+        variant: "destructive",
+      });
+      setRecommendations([1, 2, 8, 15]);
+      setShowRecommendations(true);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   if (showRecommendations) {
