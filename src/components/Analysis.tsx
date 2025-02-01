@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Leaf, TreeDeciduous, Bird } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { pipeline } from "@huggingface/transformers";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AnalysisProps {
   isLoading?: boolean;
@@ -13,45 +15,82 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
   const [habitatStructure, setHabitatStructure] = useState<string>("");
   const [wildlifeSupport, setWildlifeSupport] = useState<string>("");
   const [analyzing, setAnalyzing] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+  const { toast } = useToast();
+
+  const analyzeWithOpenAI = async (imageUrl: string, key: string) => {
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: "Analyze this garden image for biodiversity. Focus on: 1) Plant diversity 2) Habitat structure 3) Wildlife support features. Provide specific recommendations for each category.",
+                },
+                {
+                  type: "image_url",
+                  image_url: imageUrl,
+                },
+              ],
+            },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze image");
+      }
+
+      const data = await response.json();
+      const analysis = data.choices[0].message.content;
+
+      // Parse the analysis into our three categories
+      const sections = analysis.split(/\d\)/).filter(Boolean);
+      if (sections.length >= 3) {
+        setPlantDiversity(sections[0].trim());
+        setHabitatStructure(sections[1].trim());
+        setWildlifeSupport(sections[2].trim());
+      }
+    } catch (error) {
+      console.error("Error analyzing image:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     const analyzeImages = async () => {
-      if (!images?.length || analyzing) return;
+      if (!images?.length || analyzing || !apiKey) return;
       
       setAnalyzing(true);
-      console.log("Starting image analysis...");
+      console.log("Starting OpenAI image analysis...");
       
       try {
-        // Initialize the image classification pipeline
-        const classifier = await pipeline(
-          "image-classification",
-          "microsoft/resnet-50",
-          { quantized: true }
-        );
-
-        // Process each image
         for (const image of images) {
           const imageUrl = URL.createObjectURL(image);
-          const results = await classifier(imageUrl);
-          console.log("Analysis results:", results);
-
-          // Update recommendations based on detected features
-          if (results.some(r => r.label.includes("garden") || r.label.includes("plant"))) {
-            setPlantDiversity("Your garden shows good plant diversity. Consider adding native flowering plants to attract more pollinators.");
-          }
-
-          if (results.some(r => r.label.includes("tree") || r.label.includes("bush"))) {
-            setHabitatStructure("Your garden has good vertical structure. Adding different height levels with more shrubs could create additional wildlife habitats.");
-          }
-
-          if (results.some(r => r.label.includes("bird") || r.label.includes("insect"))) {
-            setWildlifeSupport("Wildlife is present in your garden! Consider adding a water feature or bird bath to attract more species.");
-          }
-
+          await analyzeWithOpenAI(imageUrl, apiKey);
           URL.revokeObjectURL(imageUrl);
         }
+        
+        toast({
+          title: "Analysis Complete",
+          description: "Your garden has been analyzed successfully!",
+        });
       } catch (error) {
         console.error("Error analyzing images:", error);
+        toast({
+          title: "Analysis Failed",
+          description: "Please check your API key and try again.",
+          variant: "destructive",
+        });
         setPlantDiversity("Unable to analyze plant diversity. Please try again.");
         setHabitatStructure("Unable to analyze habitat structure. Please try again.");
         setWildlifeSupport("Unable to analyze wildlife support. Please try again.");
@@ -61,7 +100,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
     };
 
     analyzeImages();
-  }, [images]);
+  }, [images, apiKey]);
 
   if (isLoading || analyzing) {
     return (
@@ -74,6 +113,19 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
 
   return (
     <div className="space-y-6 animate-fadeIn">
+      <div className="flex flex-col space-y-2 max-w-md mx-auto mb-6">
+        <Input
+          type="password"
+          placeholder="Enter your OpenAI API key"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          className="w-full"
+        />
+        <p className="text-sm text-gray-500">
+          Your API key is required for image analysis. It will not be stored.
+        </p>
+      </div>
+
       <h2 className="text-2xl font-semibold text-garden-primary">Garden Analysis</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="p-4 border-garden-secondary">
@@ -82,7 +134,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
             <h3 className="font-medium">Plant Diversity</h3>
           </div>
           <p className="text-sm text-gray-600">
-            {plantDiversity || "Analyzing plant diversity..."}
+            {plantDiversity || "Enter your API key to analyze plant diversity"}
           </p>
         </Card>
         <Card className="p-4 border-garden-secondary">
@@ -91,7 +143,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
             <h3 className="font-medium">Habitat Structure</h3>
           </div>
           <p className="text-sm text-gray-600">
-            {habitatStructure || "Analyzing habitat structure..."}
+            {habitatStructure || "Enter your API key to analyze habitat structure"}
           </p>
         </Card>
         <Card className="p-4 border-garden-secondary">
@@ -100,7 +152,7 @@ const Analysis = ({ isLoading, images }: AnalysisProps) => {
             <h3 className="font-medium">Wildlife Support</h3>
           </div>
           <p className="text-sm text-gray-600">
-            {wildlifeSupport || "Analyzing wildlife presence..."}
+            {wildlifeSupport || "Enter your API key to analyze wildlife support"}
           </p>
         </Card>
       </div>
