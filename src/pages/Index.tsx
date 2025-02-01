@@ -69,28 +69,28 @@ const Index = () => {
           <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6 px-4">
             <Button
               onClick={() => setSelectedOption("questionnaire")}
-              className="p-8 h-auto flex flex-col items-center space-y-4 bg-white hover:bg-gray-50 relative overflow-hidden"
+              className="p-8 h-auto flex flex-col items-center space-y-4 bg-white hover:bg-gray-50 w-full"
               variant="outline"
             >
               <ClipboardList className="w-12 h-12 text-garden-primary" />
-              <div className="text-center px-4">
+              <div className="text-center w-full">
                 <h3 className="font-semibold text-lg mb-2">Fill out Questionnaire</h3>
-                <p className="text-sm text-gray-600 break-words">
+                <p className="text-sm text-gray-600 whitespace-normal">
                   Answer questions about your garden to receive personalized recommendations
                 </p>
               </div>
             </Button>
             <Button
               disabled
-              className="p-8 h-auto flex flex-col items-center space-y-4 bg-white relative overflow-hidden"
+              className="p-8 h-auto flex flex-col items-center space-y-4 bg-white w-full"
               variant="outline"
             >
               <Upload className="w-12 h-12 text-gray-400" />
-              <div className="text-center px-4">
+              <div className="text-center w-full">
                 <h3 className="font-semibold text-lg text-gray-400 mb-2">
                   Upload Photos (Coming Soon)
                 </h3>
-                <p className="text-sm text-gray-400 break-words">
+                <p className="text-sm text-gray-400 whitespace-normal">
                   Let AI analyze your garden photos and provide recommendations
                 </p>
               </div>
