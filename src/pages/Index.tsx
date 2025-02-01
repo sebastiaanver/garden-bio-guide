@@ -2,29 +2,21 @@ import { useState } from "react";
 import { Flower2, Upload, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ImageUpload from "@/components/ImageUpload";
-import PostalCodeInput from "@/components/PostalCodeInput";
-import Analysis from "@/components/Analysis";
 import { useToast } from "@/components/ui/use-toast";
 import BiodiversityQuestionnaire from "@/components/BiodiversityQuestionnaire";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [images, setImages] = useState<File[]>([]);
-  const [postalCode, setPostalCode] = useState("");
-  const [showAnalysis, setShowAnalysis] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedOption, setSelectedOption] = useState<"questionnaire" | "upload" | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
   const handleImagesSelected = (files: File[]) => {
     setImages((prev) => [...prev, ...files]);
   };
 
-  const isValidPostalCode = (code: string) => {
-    const postalCodeRegex = /^[0-9]{4}[A-Z]{2}$/;
-    return postalCodeRegex.test(code);
-  };
-
-  const analyzeGarden = () => {
+  const analyzeGardenImages = async () => {
     if (images.length === 0) {
       toast({
         title: "No images selected",
@@ -34,20 +26,52 @@ const Index = () => {
       return;
     }
 
-    if (!isValidPostalCode(postalCode)) {
+    setIsAnalyzing(true);
+    try {
+      // Upload images to Supabase Storage
+      const imageUrls = await Promise.all(
+        images.map(async (image) => {
+          const fileExt = image.name.split('.').pop();
+          const filePath = `${crypto.randomUUID()}.${fileExt}`;
+          
+          const { data, error } = await supabase.storage
+            .from('garden_images')
+            .upload(filePath, image);
+
+          if (error) throw error;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('garden_images')
+            .getPublicUrl(filePath);
+
+          return publicUrl;
+        })
+      );
+
+      console.log('Uploaded image URLs:', imageUrls);
+
+      // Analyze images with GPT-4o
+      const { data, error } = await supabase.functions.invoke('analyze-garden-images', {
+        body: { imageUrls }
+      });
+
+      if (error) throw error;
+
+      console.log('Analysis results:', data);
+
+      // Pass the answers to BiodiversityQuestionnaire
+      setSelectedOption("questionnaire");
+      // The questionnaire component will handle the answers and show recommendations
+    } catch (error) {
+      console.error('Error analyzing garden:', error);
       toast({
-        title: "Invalid postal code",
-        description: "Please enter a valid postal code (e.g., 1234AB)",
+        title: "Analysis Error",
+        description: "There was an error analyzing your garden images. Please try again or use the questionnaire instead.",
         variant: "destructive",
       });
-      return;
-    }
-
-    setIsAnalyzing(true);
-    setTimeout(() => {
+    } finally {
       setIsAnalyzing(false);
-      setShowAnalysis(true);
-    }, 2000);
+    }
   };
 
   return (
@@ -73,7 +97,7 @@ const Index = () => {
               variant="outline"
             >
               <ClipboardList className="w-12 h-12 text-garden-primary" />
-              <div className="text-center w-full">
+              <div className="text-center">
                 <h3 className="font-semibold text-lg mb-2">Fill out Questionnaire</h3>
                 <p className="text-sm text-gray-600 whitespace-normal">
                   Answer questions about your garden to receive personalized recommendations
@@ -81,16 +105,14 @@ const Index = () => {
               </div>
             </Button>
             <Button
-              disabled
-              className="p-8 h-auto flex flex-col items-center space-y-4 bg-white w-full"
+              onClick={() => setSelectedOption("upload")}
+              className="p-8 h-auto flex flex-col items-center space-y-4 bg-white hover:bg-gray-50 w-full"
               variant="outline"
             >
-              <Upload className="w-12 h-12 text-gray-400" />
-              <div className="text-center w-full">
-                <h3 className="font-semibold text-lg text-gray-400 mb-2">
-                  Upload Photos (Coming Soon)
-                </h3>
-                <p className="text-sm text-gray-400 whitespace-normal">
+              <Upload className="w-12 h-12 text-garden-primary" />
+              <div className="text-center">
+                <h3 className="font-semibold text-lg mb-2">Upload Photos</h3>
+                <p className="text-sm text-gray-600 whitespace-normal">
                   Let AI analyze your garden photos and provide recommendations
                 </p>
               </div>
@@ -101,22 +123,30 @@ const Index = () => {
             {selectedOption === "questionnaire" ? (
               <BiodiversityQuestionnaire />
             ) : (
-              <>
+              <div className="space-y-6">
                 <ImageUpload onImagesSelected={handleImagesSelected} />
-                <PostalCodeInput value={postalCode} onChange={setPostalCode} />
                 <Button
-                  onClick={analyzeGarden}
-                  className="bg-garden-primary hover:bg-garden-secondary transition-colors"
+                  onClick={analyzeGardenImages}
+                  className="w-full bg-garden-primary hover:bg-garden-secondary transition-colors"
                   disabled={isAnalyzing}
                 >
-                  {isAnalyzing ? "Analyzing..." : "Analyze Garden"}
+                  {isAnalyzing ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                      <span>Analyzing your garden...</span>
+                    </div>
+                  ) : (
+                    "Analyze Garden"
+                  )}
                 </Button>
-                {(showAnalysis || isAnalyzing) && <Analysis isLoading={isAnalyzing} />}
-              </>
+              </div>
             )}
             <Button
               variant="outline"
-              onClick={() => setSelectedOption(null)}
+              onClick={() => {
+                setSelectedOption(null);
+                setImages([]);
+              }}
               className="mt-4"
             >
               Back to Options
