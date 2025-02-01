@@ -40,31 +40,52 @@ const Index = () => {
       console.log('Starting image upload process...');
       
       const imageUrls = await Promise.all(
-        images.map(async (image) => {
-          const fileExt = image.name.split('.').pop();
+        images.map(async (file) => {
+          const fileExt = file.name.split('.').pop();
           const fileName = `${crypto.randomUUID()}.${fileExt}`;
           
-          console.log('Attempting to upload file:', fileName);
+          console.log('Attempting to upload file:', fileName, 'Size:', file.size);
           
-          const { data, error: uploadError } = await supabase.storage
-            .from('garden_images')
-            .upload(fileName, image, {
-              cacheControl: '3600',
-              upsert: false
-            });
+          const maxRetries = 3;
+          let attempt = 0;
+          
+          while (attempt < maxRetries) {
+            try {
+              const { data, error: uploadError } = await supabase.storage
+                .from('garden_images')
+                .upload(fileName, file, {
+                  cacheControl: '3600',
+                  upsert: false
+                });
 
-          if (uploadError) {
-            console.error('Upload error:', uploadError);
-            throw uploadError;
+              if (uploadError) {
+                console.error(`Upload error (attempt ${attempt + 1}):`, uploadError);
+                attempt++;
+                if (attempt === maxRetries) throw uploadError;
+                await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                continue;
+              }
+
+              console.log('Upload successful:', data);
+
+              const { data: { publicUrl } } = supabase.storage
+                .from('garden_images')
+                .getPublicUrl(fileName);
+
+              // Verify the URL is accessible
+              const response = await fetch(publicUrl, { method: 'HEAD' });
+              if (!response.ok) {
+                throw new Error(`Image URL not accessible: ${publicUrl}`);
+              }
+
+              return publicUrl;
+            } catch (error) {
+              console.error(`Attempt ${attempt + 1} failed:`, error);
+              attempt++;
+              if (attempt === maxRetries) throw error;
+              await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            }
           }
-
-          console.log('Upload successful:', data);
-
-          const { data: { publicUrl } } = supabase.storage
-            .from('garden_images')
-            .getPublicUrl(fileName);
-
-          return publicUrl;
         })
       );
 
@@ -91,7 +112,7 @@ const Index = () => {
       console.error('Error analyzing garden:', error);
       toast({
         title: "Analysis Error",
-        description: "There was an error analyzing your garden images. Please try again or use the questionnaire instead.",
+        description: "There was an error processing your garden images. Please try uploading smaller images or use the questionnaire instead.",
         variant: "destructive",
       });
     } finally {
