@@ -43,6 +43,24 @@ Available measures:
 14 = Birdhouses
 15 = Bee Hotels
 
+Measures details:
+#	Measure	Description	Key Benefits	Implementation Highlights
+1	Hedgehog House	Shelter for hedgehogs to overwinter and breed.	🦔 Biodiversity, natural pest control, wildlife habitat	Place in a sheltered, dry spot covered with leaves and twigs. No milk; cat food can be given if needed.
+2	Plant Selection	Using native, layered vegetation (low plants, shrubs, trees) for year-round biodiversity.	🌿 Biodiversity, cooling, soil health, ecological management	Use native, pollinator-friendly, and pesticide-free plants. Ensure year-round flowering.
+3	Vegetable Garden	Growing food without chemical pesticides; improving soil health.	🍅 Biodiversity, soil health, sustainability	Use companion planting (e.g., marigolds for pest control), compost, and crop rotation.
+4	Pond	Water feature with shallow edges for wildlife habitat and ecosystem balance.	💧 Biodiversity, water storage, ecological function	Use native water plants, avoid fish to prevent nutrient overload, maintain clean edges.
+5	Natural Boundaries	Using hedgerows, trees, and shrubs instead of fences for natural separation.	🌳 Biodiversity, habitat connectivity, wind protection	Plant mixed hedgerows with species like hawthorn, blackthorn, or willow. Avoid impermeable barriers.
+6	Trees & Orchards	Planting trees, including fruit trees, for ecosystem stability and food sources.	🍏 Biodiversity, habitat, shade, carbon capture	Use native trees; avoid excessive pruning. Incorporate a protective hedge around orchards.
+7	Wadi & Flat Bank	Creating water retention areas for flood control and biodiversity.	💦 Water storage, biodiversity, cooling	Design for natural water drainage; plant water-tolerant species such as reeds and sedges.
+8	Flower Strips	Planting native wildflower meadows to support pollinators and insects.	🦋 Pollinators, biodiversity, habitat	Use native wildflower seed mixes, minimize mowing, avoid fertilizers.
+9	Wildlife Corners	Leaving areas untidy (piles of wood, stones, compost) to support small animals & insects.	🦎 Biodiversity, habitat, food web support	Create brush piles, leave dead wood, avoid chemical treatments.
+10	Phased Mowing	Rotational mowing to allow insects and plants to thrive.	🌱 Pollinators, biodiversity, soil health	Mow in sections, leave some areas undisturbed. Remove cuttings to avoid over-fertilization.
+11	Permeable Surfaces	Reducing paved areas to increase soil permeability.	🌍 Biodiversity, water retention, soil health	Replace impermeable surfaces with gravel, grass pavers, or permeable stones.
+12	Owl Nest Boxes	Providing safe nesting sites for owls that control rodent populations.	🦉 Biodiversity, natural pest control	Install in barns or trees, ensure predator protection (e.g., against martens).
+13	Bat Boxes	Safe roosting spots for bats, which help control insect populations.	🦇 Biodiversity, natural pest control	Place boxes on buildings or trees near feeding areas (e.g., hedgerows, water bodies).
+14	Birdhouses	Nesting sites for various bird species.	🐦 Biodiversity, pest control, habitat support	Provide different house types for different species. Avoid placing near high-traffic areas.
+15	Bee Hotels	Nesting sites for wild bees to support pollination.	🐝 Pollinators, biodiversity, food security	Use untreated wood, drill holes of varying diameters, place in sunny areas.
+
 Return a JSON object with three properties:
 1. recommendations: array of recommended measure IDs (numbers 1-15)
 2. environmentScores: object mapping measure IDs to environment scores (1-5)

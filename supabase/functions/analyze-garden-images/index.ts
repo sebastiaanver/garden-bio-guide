@@ -59,23 +59,23 @@ serve(async (req) => {
             role: 'system',
             content: `You are a garden biodiversity expert analyzing garden images. Your task is to assess various aspects of the garden's biodiversity and management practices. Analyze the following aspects and respond with a JSON object containing these fields:
 
-landSize: ("small" < 500 m², "medium" 500-2000 m², "large" > 2000 m²)
-landUse: ("private_garden", "agricultural", "mixed")
-currentMeasures: ("yes", "no", "not_sure")
-vegetationTypes: Array of ["lawn", "wildflower", "native_trees", "exotic", "vegetables", "other"]
-nativeSpecies: ("mostly_native", "mixed", "mostly_non_native")
-vegetationHeight: ("diverse", "some_variation", "uniform")
-wildlifeFeatures: Array of ["hedgehog_house", "birdhouses", "bat_boxes", "bee_hotel", "log_piles", "none"]
-waterFeatures: ("natural_pond", "man_made_pond", "no_water")
-foodSources: ("year_round", "seasonally", "no")
-grassManagement: ("mow_regularly", "leave_uncut", "rotational_mowing")
-chemicalUse: ("frequently", "occasionally", "natural_methods")
-soilHealth: ("compost", "chemical_fertilizers", "no_management")
-landConnectivity: ("well_connected", "somewhat_connected", "isolated")
-wildlifeBarriers: ("many_barriers", "some_barriers", "accessible")
-sustainableUse: ("yes", "no")
-improvements: ("actively_looking", "maybe", "satisfied")
-aspectsToImprove: Array of ["wildlife_habitats", "plant_diversity", "water_retention", "reducing_pesticide", "encouraging_pollinators", "other"]
+landSize: ("small" < 500 m², "medium" 500-2000 m², "large" > 2000 m²) - q: What is the approximate size of the land?
+landUse: ("private_garden", "agricultural", "mixed") - q: What is the main use of the land?
+currentMeasures: ("yes", "no", "not_sure") - q: Are there measures present that promote biodiversity?
+vegetationTypes: Array of ["lawn", "wildflower", "native_trees", "exotic", "vegetables", "other"] - q: What types of vegetation are present on the land? 
+nativeSpecies: ("mostly_native", "mixed", "mostly_non_native") - q: Are there native species to support local biodiversity?
+vegetationHeight: ("diverse", "some_variation", "uniform") - q: Is there a mix of vegetation heights (e.g., ground cover, shrubs, trees)?
+wildlifeFeatures: Array of ["hedgehog_house", "birdhouses", "bat_boxes", "bee_hotel", "log_piles", "none"] - q: Are there any of the following wildlife-friendly features on the land?
+waterFeatures: ("natural_pond", "man_made_pond", "no_water") - q: Are there any water features present?
+foodSources: ("year_round", "seasonally", "no") - q: Are there food sources for wildlife (e.g., flowers for pollinators, fruit trees, bird feeders)
+grassManagement: ("mow_regularly", "leave_uncut", "rotational_mowing") - q: Based on the image(s), how is the grass and lawns managed?
+chemicalUse: ("frequently", "occasionally", "natural_methods") - q: Based on the image(s), is there chemical pesticides or herbicides used?
+soilHealth: ("compost", "chemical_fertilizers", "no_management") - q: Based on the image(s), how is the soil health and fertility managed?
+landConnectivity: ("well_connected", "somewhat_connected", "isolated") - q: Is the land connected to other green areas (e.g., hedgerows, corridors to forests, neighboring gardens with biodiversity-friendly features)?
+wildlifeBarriers: ("many_barriers", "some_barriers", "accessible") - q: Are there any barriers that prevent wildlife movement (e.g., solid fences, walls without openings, roads)?
+sustainableUse: ("yes", "no") - q: Are there any areas dedicated to sustainable land use (e.g., permaculture, regenerative farming, water retention features like a wadi)?
+improvements: ("actively_looking", "maybe", "satisfied") - q: Are you interested in making improvements to enhance biodiversity? -> always answer with actively_looking
+aspectsToImprove: Array of ["wildlife_habitats", "plant_diversity", "water_retention", "reducing_pesticide", "encouraging_pollinators", "other"] - q: Which aspects of biodiversity could be improved?
 
 Remember to respond with a valid JSON object containing all these fields.`
           },
