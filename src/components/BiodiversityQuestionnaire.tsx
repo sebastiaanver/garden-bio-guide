@@ -8,6 +8,7 @@ import { analyzeQuestionnaire } from "@/utils/analyzeQuestionnaire";
 import BiodiversityRecommendations from "./BiodiversityRecommendations";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
+import { Flower2 } from "lucide-react";
 
 const BiodiversityQuestionnaire = () => {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -66,66 +67,22 @@ const BiodiversityQuestionnaire = () => {
     return <BiodiversityRecommendations recommendations={recommendations} />;
   }
 
-  const renderQuestion = (question: Question) => {
-    if (question.type === "single") {
-      return (
-        <div className="space-y-2">
-          {question.options.map((option) => (
-            <div key={option.value} className="flex items-center space-x-2">
-              <input
-                type="radio"
-                id={`${question.id}-${option.value}`}
-                name={question.id}
-                value={option.value}
-                checked={(answers[question.id] as string) === option.value}
-                onChange={(e) => handleSingleAnswer(question.id, e.target.value)}
-                className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
-              />
-              <label htmlFor={`${question.id}-${option.value}`} className="text-sm">
-                {option.label}
-              </label>
-              {option.allowCustom && answers[question.id] === option.value && (
-                <Input
-                  className="ml-2 w-48"
-                  placeholder="Please specify"
-                  value={customAnswers[question.id] || ""}
-                  onChange={(e) => handleCustomAnswer(question.id, e.target.value)}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      );
-    }
-
+  if (isAnalyzing) {
     return (
-      <div className="space-y-2">
-        {question.options.map((option) => (
-          <div key={option.value} className="flex items-center space-x-2">
-            <Checkbox
-              id={`${question.id}-${option.value}`}
-              checked={(answers[question.id] as string[] || []).includes(option.value)}
-              onCheckedChange={(checked) =>
-                handleMultipleAnswer(question.id, option.value, checked as boolean)
-              }
-            />
-            <label htmlFor={`${question.id}-${option.value}`} className="text-sm">
-              {option.label}
-            </label>
-            {option.allowCustom &&
-              (answers[question.id] as string[] || []).includes(option.value) && (
-                <Input
-                  className="ml-2 w-48"
-                  placeholder="Please specify"
-                  value={customAnswers[question.id] || ""}
-                  onChange={(e) => handleCustomAnswer(question.id, e.target.value)}
-                />
-              )}
-          </div>
-        ))}
+      <div className="flex flex-col items-center justify-center space-y-4 min-h-[400px]">
+        <div className="relative">
+          <Flower2 className="w-16 h-16 text-garden-secondary animate-spin" />
+          <div className="absolute inset-0 animate-pulse bg-garden-cream/20 rounded-full" />
+        </div>
+        <p className="text-lg text-garden-primary animate-pulse">
+          Analyzing your garden's biodiversity...
+        </p>
+        <p className="text-sm text-gray-600">
+          Creating personalized recommendations for your garden
+        </p>
       </div>
     );
-  };
+  }
 
   const currentSectionData = questionnaireSections[currentSection];
 
