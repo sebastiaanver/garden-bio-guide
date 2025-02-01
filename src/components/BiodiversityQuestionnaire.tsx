@@ -63,6 +63,67 @@ const BiodiversityQuestionnaire = () => {
     }
   };
 
+  const renderQuestion = (question: Question) => {
+    if (question.type === "single") {
+      return (
+        <div className="space-y-2">
+          {question.options.map((option) => (
+            <div key={option.value} className="flex items-center space-x-2">
+              <input
+                type="radio"
+                id={`${question.id}-${option.value}`}
+                name={question.id}
+                value={option.value}
+                checked={(answers[question.id] as string) === option.value}
+                onChange={(e) => handleSingleAnswer(question.id, e.target.value)}
+                className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+              />
+              <label htmlFor={`${question.id}-${option.value}`} className="text-sm">
+                {option.label}
+              </label>
+              {option.allowCustom && answers[question.id] === option.value && (
+                <Input
+                  className="ml-2 w-48"
+                  placeholder="Please specify"
+                  value={customAnswers[question.id] || ""}
+                  onChange={(e) => handleCustomAnswer(question.id, e.target.value)}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        {question.options.map((option) => (
+          <div key={option.value} className="flex items-center space-x-2">
+            <Checkbox
+              id={`${question.id}-${option.value}`}
+              checked={(answers[question.id] as string[] || []).includes(option.value)}
+              onCheckedChange={(checked) =>
+                handleMultipleAnswer(question.id, option.value, checked as boolean)
+              }
+            />
+            <label htmlFor={`${question.id}-${option.value}`} className="text-sm">
+              {option.label}
+            </label>
+            {option.allowCustom &&
+              (answers[question.id] as string[] || []).includes(option.value) && (
+                <Input
+                  className="ml-2 w-48"
+                  placeholder="Please specify"
+                  value={customAnswers[question.id] || ""}
+                  onChange={(e) => handleCustomAnswer(question.id, e.target.value)}
+                />
+              )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (showRecommendations) {
     return <BiodiversityRecommendations recommendations={recommendations} />;
   }
