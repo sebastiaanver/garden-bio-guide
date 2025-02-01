@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Flower2 } from "lucide-react";
+import { Flower2, FileText, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -255,13 +255,16 @@ const Index = () => {
               <div className="relative">
                 <Button
                   variant={selectedOption === "questionnaire" ? "default" : "outline"}
-                  className={`w-full p-8 h-auto flex flex-col items-center space-y-4 whitespace-normal ${
+                  className={`w-full p-8 h-auto flex flex-col items-start space-y-4 whitespace-normal ${
                     selectedOption === "questionnaire" ? "bg-garden-primary" : ""
                   }`}
                   onClick={() => setSelectedOption("questionnaire")}
                 >
-                  <span className="text-xl font-semibold break-words">Fill Questionnaire</span>
-                  <p className="text-sm opacity-80 break-words">
+                  <div className="flex items-center w-full">
+                    <FileText className="w-6 h-6 mr-2" />
+                    <span className="text-xl font-semibold break-words text-left">Fill Questionnaire</span>
+                  </div>
+                  <p className="text-sm opacity-80 break-words text-left">
                     Answer questions about your garden's features and management practices to receive personalized recommendations.
                   </p>
                 </Button>
@@ -270,13 +273,16 @@ const Index = () => {
               <div className="relative">
                 <Button
                   variant={selectedOption === "upload" ? "default" : "outline"}
-                  className={`w-full p-8 h-auto flex flex-col items-center space-y-4 whitespace-normal ${
+                  className={`w-full p-8 h-auto flex flex-col items-start space-y-4 whitespace-normal ${
                     selectedOption === "upload" ? "bg-garden-primary" : ""
                   }`}
                   onClick={() => setSelectedOption("upload")}
                 >
-                  <span className="text-xl font-semibold break-words">Upload Photos</span>
-                  <p className="text-sm opacity-80 break-words">
+                  <div className="flex items-center w-full">
+                    <Upload className="w-6 h-6 mr-2" />
+                    <span className="text-xl font-semibold break-words text-left">Upload Photos</span>
+                  </div>
+                  <p className="text-sm opacity-80 break-words text-left">
                     Upload photos of your garden and let our AI analyze them to provide tailored biodiversity recommendations.
                   </p>
                 </Button>
