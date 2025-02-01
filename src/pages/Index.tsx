@@ -17,6 +17,11 @@ const Index = () => {
     setImages((prev) => [...prev, ...files]);
   };
 
+  const isValidPostalCode = (code: string) => {
+    const postalCodeRegex = /^[0-9]{4}[A-Z]{2}$/;
+    return postalCodeRegex.test(code);
+  };
+
   const analyzeGarden = () => {
     if (images.length === 0) {
       toast({
@@ -27,10 +32,10 @@ const Index = () => {
       return;
     }
 
-    if (postalCode.length !== 5) {
+    if (!isValidPostalCode(postalCode)) {
       toast({
         title: "Invalid postal code",
-        description: "Please enter a valid 5-digit postal code",
+        description: "Please enter a valid postal code (e.g., 1234AB)",
         variant: "destructive",
       });
       return;

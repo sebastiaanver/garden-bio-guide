@@ -8,8 +8,14 @@ interface PostalCodeInputProps {
 
 const PostalCodeInput = ({ value, onChange }: PostalCodeInputProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value.replace(/[^0-9]/g, "").slice(0, 5);
-    onChange(newValue);
+    const input = e.target.value.toUpperCase();
+    
+    // Format: first 4 characters must be numbers, last 2 must be letters
+    const numbers = input.slice(0, 4).replace(/[^0-9]/g, "");
+    const letters = input.slice(4, 6).replace(/[^A-Z]/g, "");
+    
+    const formattedValue = `${numbers}${letters}`;
+    onChange(formattedValue);
   };
 
   return (
@@ -18,10 +24,11 @@ const PostalCodeInput = ({ value, onChange }: PostalCodeInputProps) => {
       <Input
         id="postal-code"
         type="text"
-        placeholder="Enter your postal code"
+        placeholder="1234AB"
         value={value}
         onChange={handleChange}
-        className="max-w-[200px]"
+        maxLength={6}
+        className="max-w-[200px] uppercase"
       />
     </div>
   );
