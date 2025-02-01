@@ -1,7 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+import { Configuration, OpenAIApi } from "https://esm.sh/openai@3.2.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,17 +8,21 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { answers } = await req.json();
-    console.log('Received answers:', answers);
+    console.log('Analyzing questionnaire answers:', answers);
 
-    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. For each recommended measure:
-1. Provide an impact score (1-5 scale, where 5 is highest impact)
-2. Provide a brief explanation of why you assigned that impact score
+    const configuration = new Configuration({
+      apiKey: Deno.env.get('OPENAI_API_KEY'),
+    });
+    const openai = new OpenAIApi(configuration);
+
+    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. Return the response in JSON format.
 
 Questionnaire Responses:
 ${JSON.stringify(answers, null, 2)}
@@ -41,74 +44,47 @@ Available measures:
 14 = Birdhouses
 15 = Bee Hotels
 
-Return a JSON object with three properties:
-1. recommendations: array of recommended measure IDs
+Return a JSON object with two properties:
+1. recommendations: array of recommended measure IDs (numbers 1-15)
 2. environmentScores: object mapping measure IDs to environment scores (1-5)
-3. impactReasonings: object mapping measure IDs to objects containing:
-   - score: impact score (1-5)
-   - reasoning: brief explanation for the score
 
-Example response:
-{
-  "recommendations": [1, 4, 8, 15],
-  "environmentScores": {
-    "1": 4,
-    "4": 3,
-    "8": 5,
-    "15": 4
-  },
-  "impactReasonings": {
-    "1": {
-      "score": 4,
-      "reasoning": "Hedgehogs are excellent natural pest controllers and their presence indicates a healthy ecosystem"
-    },
-    "4": {
-      "score": 5,
-      "reasoning": "A pond provides essential habitat for amphibians and insects, significantly boosting biodiversity"
-    }
-  }
-}`;
+The response must be valid JSON.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, environment scores, and impact reasonings.'
-          },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-      }),
+    const response = await openai.createChatCompletion({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations and environment scores. Your response must be in JSON format."
+        },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7,
+      response_format: { type: "json_object" }
     });
 
-    const data = await response.json();
-    console.log('OpenAI response:', data);
+    console.log('OpenAI response:', response.data);
 
-    if (!data.choices?.[0]?.message?.content) {
+    if (!response.data.choices?.[0]?.message?.content) {
       throw new Error('Invalid response from OpenAI');
     }
 
     let result;
     try {
-      const content = data.choices[0].message.content.trim();
+      const content = response.data.choices[0].message.content.trim();
       result = JSON.parse(content);
       
-      if (!Array.isArray(result.recommendations) || !result.environmentScores || !result.impactReasonings) {
+      // Validate and clean up the response
+      if (!Array.isArray(result.recommendations) || !result.environmentScores) {
         throw new Error('Invalid response format');
       }
       
-      // Validate and clean up the response
+      // Ensure recommendations are valid numbers
       result.recommendations = result.recommendations.filter(id => 
         typeof id === 'number' && id >= 1 && id <= 15
       );
       
+      // Ensure environment scores are valid
       result.environmentScores = Object.fromEntries(
         Object.entries(result.environmentScores)
           .filter(([id, score]) => 
@@ -123,38 +99,34 @@ Example response:
       console.error('Error parsing OpenAI response:', error);
       result = {
         recommendations: [1, 2, 8, 15],
-        environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 },
-        impactReasonings: {
-          "1": { score: 4, reasoning: "Provides shelter for beneficial wildlife" },
-          "2": { score: 5, reasoning: "Foundation for biodiversity" },
-          "8": { score: 4, reasoning: "Supports essential pollinators" },
-          "15": { score: 5, reasoning: "Critical for wild bee populations" }
-        }
+        environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 }
       };
     }
 
     return new Response(
       JSON.stringify(result),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     );
+
   } catch (error) {
     console.error('Error in analyze-questionnaire function:', error);
+    
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         recommendations: [1, 2, 8, 15],
         environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 },
-        impactReasonings: {
-          "1": { score: 4, reasoning: "Provides shelter for beneficial wildlife" },
-          "2": { score: 5, reasoning: "Foundation for biodiversity" },
-          "8": { score: 4, reasoning: "Supports essential pollinators" },
-          "15": { score: 5, reasoning: "Critical for wild bee populations" }
-        },
-        error: error.message 
+        error: error.message
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     );
   }
