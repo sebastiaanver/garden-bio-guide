@@ -28,6 +28,8 @@ const Index = () => {
 
     setIsAnalyzing(true);
     try {
+      console.log('Starting image upload process...');
+      
       // Upload images to Supabase Storage
       const imageUrls = await Promise.all(
         images.map(async (image) => {
