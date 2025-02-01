@@ -8,7 +8,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -22,7 +21,7 @@ serve(async (req) => {
     });
     const openai = new OpenAIApi(configuration);
 
-    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. Return the response in JSON format.
+    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. For each recommended measure, provide a score (1-5) indicating how well it fits the specific environment, along with clear reasoning for the score.
 
 Questionnaire Responses:
 ${JSON.stringify(answers, null, 2)}
@@ -44,18 +43,30 @@ Available measures:
 14 = Birdhouses
 15 = Bee Hotels
 
-Return a JSON object with two properties:
+Return a JSON object with three properties:
 1. recommendations: array of recommended measure IDs (numbers 1-15)
 2. environmentScores: object mapping measure IDs to environment scores (1-5)
+3. scoreReasonings: object mapping measure IDs to strings explaining the reasoning behind each score
+
+Example response format:
+{
+  "recommendations": [1, 2, 8],
+  "environmentScores": {"1": 4, "2": 5, "8": 3},
+  "scoreReasonings": {
+    "1": "High score due to garden size and existing vegetation providing good shelter",
+    "2": "Perfect match given soil conditions and climate",
+    "8": "Moderate score due to limited space but good sun exposure"
+  }
+}
 
 The response must be valid JSON.`;
 
     const response = await openai.createChatCompletion({
-      model: "gpt-4",
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations and environment scores. Your response must be in JSON format."
+          content: "You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations, environment scores, and reasoning. Your response must be in JSON format."
         },
         { role: "user", content: prompt }
       ],
@@ -69,38 +80,14 @@ The response must be valid JSON.`;
       throw new Error('Invalid response from OpenAI');
     }
 
-    let result;
-    try {
-      const content = response.data.choices[0].message.content.trim();
-      result = JSON.parse(content);
-      
-      // Validate and clean up the response
-      if (!Array.isArray(result.recommendations) || !result.environmentScores) {
-        throw new Error('Invalid response format');
-      }
-      
-      // Ensure recommendations are valid numbers
-      result.recommendations = result.recommendations.filter(id => 
-        typeof id === 'number' && id >= 1 && id <= 15
-      );
-      
-      // Ensure environment scores are valid
-      result.environmentScores = Object.fromEntries(
-        Object.entries(result.environmentScores)
-          .filter(([id, score]) => 
-            result.recommendations.includes(Number(id)) &&
-            typeof score === 'number' &&
-            score >= 1 &&
-            score <= 5
-          )
-      );
-      
-    } catch (error) {
-      console.error('Error parsing OpenAI response:', error);
-      result = {
-        recommendations: [1, 2, 8, 15],
-        environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 }
-      };
+    const content = response.data.choices[0].message.content.trim();
+    const result = JSON.parse(content);
+    
+    // Validate response format
+    if (!Array.isArray(result.recommendations) || 
+        !result.environmentScores || 
+        !result.scoreReasonings) {
+      throw new Error('Invalid response format from AI');
     }
 
     return new Response(
@@ -115,14 +102,10 @@ The response must be valid JSON.`;
 
   } catch (error) {
     console.error('Error in analyze-questionnaire function:', error);
-    
     return new Response(
-      JSON.stringify({
-        recommendations: [1, 2, 8, 15],
-        environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 },
-        error: error.message
-      }),
+      JSON.stringify({ error: error.message }),
       { 
+        status: 500,
         headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json'

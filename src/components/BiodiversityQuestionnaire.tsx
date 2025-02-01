@@ -69,6 +69,9 @@ const BiodiversityQuestionnaire = ({
     
     try {
       const result = await analyzeQuestionnaire(answers);
+      if (result.error) {
+        throw new Error(result.error);
+      }
       setRecommendations(result.recommendations);
       setEnvironmentScores(result.environmentScores);
       setShowRecommendations(true);
@@ -76,12 +79,9 @@ const BiodiversityQuestionnaire = ({
       console.error("Error analyzing questionnaire:", error);
       toast({
         title: "Analysis Error",
-        description: "There was an error analyzing your responses. Using default recommendations instead.",
+        description: error.message || "There was an error analyzing your responses. Please try again.",
         variant: "destructive",
       });
-      setRecommendations([1, 2, 8, 15]);
-      setEnvironmentScores({ "1": 3, "2": 3, "8": 3, "15": 3 });
-      setShowRecommendations(true);
     } finally {
       setIsAnalyzing(false);
     }

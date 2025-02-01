@@ -174,32 +174,38 @@ const measures: Measure[] = [
 interface Props {
   recommendations: number[];
   environmentScores?: Record<number, number>;
+  scoreReasonings?: Record<number, string>;
 }
 
-const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }: Props) => {
+const BiodiversityRecommendations = ({ 
+  recommendations, 
+  environmentScores = {}, 
+  scoreReasonings = {} 
+}: Props) => {
   const recommendedMeasures = measures
     .filter(measure => recommendations.includes(measure.id))
     .map(measure => ({
       ...measure,
-      environmentScore: environmentScores[measure.id] || 3
+      environmentScore: environmentScores[measure.id],
+      scoreReasoning: scoreReasonings[measure.id]
     }));
 
-  const calculateTotalPoints = (measure: Measure) => {
+  const calculateTotalPoints = (measure: Measure & { scoreReasoning?: string }) => {
     const difficultyPoints = 5 - measure.difficulty;
     const impactPoints = measure.impact;
-    const environmentPoints = measure.environmentScore || 3;
+    const environmentPoints = measure.environmentScore || 0;
     return difficultyPoints + impactPoints + environmentPoints;
   };
 
   const pointTypeDescriptions = {
     difficulty: "Points awarded based on ease of implementation. Lower difficulty measures receive more points to encourage starting with simpler actions that can make an immediate impact.",
     impact: "Points reflect the measure's potential positive effect on biodiversity. Higher points indicate greater benefits for local wildlife and ecosystem health.",
-    environment: "Points indicate how well this measure aligns with your specific environment and conditions, based on your questionnaire responses or garden analysis."
+    environment: "Points indicate how well this measure aligns with your specific environment and conditions, based on your questionnaire responses."
   };
 
   return (
     <div className="space-y-6">
-      <TooltipProvider>
+      <TooltipProvider delayDuration={50}>
         <Card>
           <CardHeader>
             <CardTitle>Recommended Biodiversity Measures</CardTitle>
@@ -230,9 +236,9 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                             <span className="text-muted-foreground">Difficulty Points</span>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer" />
+                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent>
+                              <TooltipContent side="top">
                                 <p className="max-w-xs">
                                   {pointTypeDescriptions.difficulty}
                                 </p>
@@ -246,9 +252,9 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                             <span className="text-muted-foreground">Impact Points</span>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer" />
+                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent>
+                              <TooltipContent side="top">
                                 <p className="max-w-xs">
                                   {measure.impactReasoning || pointTypeDescriptions.impact}
                                 </p>
@@ -262,11 +268,11 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                             <span className="text-muted-foreground">Environment Points</span>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer" />
+                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
                               </TooltipTrigger>
-                              <TooltipContent>
+                              <TooltipContent side="top">
                                 <p className="max-w-xs">
-                                  {pointTypeDescriptions.environment}
+                                  {measure.scoreReasoning || pointTypeDescriptions.environment}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
