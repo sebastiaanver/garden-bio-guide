@@ -142,7 +142,7 @@ const Index = () => {
               Upload photos of your garden for analysis
             </p>
           </div>
-          <div className="max-w-4xl mx-auto space-y-8 bg-white p-8 rounded-lg shadow-sm">
+          <div className="max-w-4xl mx-auto space-y-8">
             {!skipQuestionnaire ? (
               <div className="space-y-6">
                 <ImageUpload onImagesSelected={handleImagesSelected} />
@@ -198,7 +198,7 @@ const Index = () => {
               Let's assess your garden's biodiversity
             </p>
           </div>
-          <div className="max-w-4xl mx-auto space-y-8 bg-white p-8 rounded-lg shadow-sm">
+          <div className="max-w-4xl mx-auto space-y-8">
             <BiodiversityQuestionnaire />
             <Button
               variant="outline"
@@ -231,10 +231,10 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="max-w-6xl mx-auto space-y-6 bg-white p-8 rounded-lg shadow-sm">
+        <div className="max-w-6xl mx-auto space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name" className="text-left">Name</Label>
               <Input
                 id="name"
                 value={name}
@@ -250,7 +250,7 @@ const Index = () => {
           </div>
 
           <div className="space-y-4">
-            <Label>Choose an option:</Label>
+            <Label className="text-left">Choose an option:</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="relative">
                 <Button
