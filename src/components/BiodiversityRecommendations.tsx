@@ -251,7 +251,7 @@ const BiodiversityRecommendations = ({
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
                                   <p className="max-w-xs">
-                                    {measure.difficultyReasoning || "Points awarded based on ease of implementation. Lower difficulty measures receive more points."}
+                                    {measure.difficultyReasoning || `Points awarded based on ease of implementation. Lower difficulty measures receive more points. Current difficulty score: ${measure.difficultyScore || (5 - measure.difficulty)}/5`}
                                   </p>
                                 </TooltipContent>
                               </Tooltip>
