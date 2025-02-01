@@ -52,7 +52,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-garden-cream">
-      <div className="container py-8 space-y-8">
+      <div className="px-4 py-8 space-y-8">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
             <Flower2 className="w-12 h-12 text-garden-primary" />
@@ -60,13 +60,13 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-garden-primary">
             Garden Biodiversity Analyzer
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto px-4">
             Assess your garden's biodiversity and get personalized recommendations to enhance it.
           </p>
         </div>
 
         {!selectedOption ? (
-          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6 px-4">
             <Button
               onClick={() => setSelectedOption("questionnaire")}
               className="p-8 h-auto flex flex-col items-center space-y-4 bg-white hover:bg-gray-50"
