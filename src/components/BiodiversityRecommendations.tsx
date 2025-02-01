@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { measures } from "./biodiversity/measures";
 import MeasureCard from "./biodiversity/MeasureCard";
 import type { BiodiversityProps, Measure, ReasoningType } from "./biodiversity/types";
-
 
 const BiodiversityRecommendations = ({ 
   recommendations, 
@@ -56,17 +56,19 @@ const BiodiversityRecommendations = ({
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[600px] pr-4">
-            <div className="space-y-6">
-              {recommendedMeasures
-                .sort((a, b) => calculateTotalPoints(b) - calculateTotalPoints(a))
-                .map((measure) => (
-                  <MeasureCard 
-                    key={measure.id}
-                    measure={measure}
-                    calculateTotalPoints={calculateTotalPoints}
-                  />
-                ))}
-            </div>
+            <TooltipProvider>
+              <div className="space-y-6">
+                {recommendedMeasures
+                  .sort((a, b) => calculateTotalPoints(b) - calculateTotalPoints(a))
+                  .map((measure) => (
+                    <MeasureCard 
+                      key={measure.id}
+                      measure={measure}
+                      calculateTotalPoints={calculateTotalPoints}
+                    />
+                  ))}
+              </div>
+            </TooltipProvider>
           </ScrollArea>
         </CardContent>
       </Card>
