@@ -199,38 +199,38 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Recommended Biodiversity Measures</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[600px] pr-4">
-            <div className="space-y-6">
-              {recommendedMeasures
-                .sort((a, b) => calculateTotalPoints(b) - calculateTotalPoints(a))
-                .map((measure) => (
-                <Card key={measure.id}>
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-2xl">{measure.emoji}</span>
-                        <CardTitle className="text-lg">{measure.title}</CardTitle>
+      <TooltipProvider>
+        <Card>
+          <CardHeader>
+            <CardTitle>Recommended Biodiversity Measures</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[600px] pr-4">
+              <div className="space-y-6">
+                {recommendedMeasures
+                  .sort((a, b) => calculateTotalPoints(b) - calculateTotalPoints(a))
+                  .map((measure) => (
+                  <Card key={measure.id}>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-2xl">{measure.emoji}</span>
+                          <CardTitle className="text-lg">{measure.title}</CardTitle>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Total Points: {calculateTotalPoints(measure)}
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        Total Points: {calculateTotalPoints(measure)}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <Progress value={(calculateTotalPoints(measure) / 15) * 100} className="h-2" />
-                    <div className="grid grid-cols-3 gap-2 text-sm">
-                      <div className="flex flex-col">
-                        <div className="flex items-center space-x-1">
-                          <span className="text-muted-foreground">Difficulty Points</span>
-                          <TooltipProvider>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <Progress value={(calculateTotalPoints(measure) / 15) * 100} className="h-2" />
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <div className="flex flex-col">
+                          <div className="flex items-center space-x-1">
+                            <span className="text-muted-foreground">Difficulty Points</span>
                             <Tooltip>
-                              <TooltipTrigger>
-                                <Info className="h-4 w-4 text-muted-foreground" />
+                              <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer" />
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="max-w-xs">
@@ -238,17 +238,15 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                                 </p>
                               </TooltipContent>
                             </Tooltip>
-                          </TooltipProvider>
+                          </div>
+                          <span className="font-medium">{5 - measure.difficulty}</span>
                         </div>
-                        <span className="font-medium">{5 - measure.difficulty}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center space-x-1">
-                          <span className="text-muted-foreground">Impact Points</span>
-                          <TooltipProvider>
+                        <div className="flex flex-col">
+                          <div className="flex items-center space-x-1">
+                            <span className="text-muted-foreground">Impact Points</span>
                             <Tooltip>
-                              <TooltipTrigger>
-                                <Info className="h-4 w-4 text-muted-foreground" />
+                              <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer" />
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="max-w-xs">
@@ -256,17 +254,15 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                                 </p>
                               </TooltipContent>
                             </Tooltip>
-                          </TooltipProvider>
+                          </div>
+                          <span className="font-medium">{measure.impact}</span>
                         </div>
-                        <span className="font-medium">{measure.impact}</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center space-x-1">
-                          <span className="text-muted-foreground">Environment Points</span>
-                          <TooltipProvider>
+                        <div className="flex flex-col">
+                          <div className="flex items-center space-x-1">
+                            <span className="text-muted-foreground">Environment Points</span>
                             <Tooltip>
-                              <TooltipTrigger>
-                                <Info className="h-4 w-4 text-muted-foreground" />
+                              <TooltipTrigger asChild>
+                                <Info className="h-4 w-4 text-muted-foreground cursor-pointer" />
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="max-w-xs">
@@ -274,30 +270,30 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                                 </p>
                               </TooltipContent>
                             </Tooltip>
-                          </TooltipProvider>
+                          </div>
+                          <span className="font-medium">{measure.environmentScore}</span>
                         </div>
-                        <span className="font-medium">{measure.environmentScore}</span>
                       </div>
-                    </div>
-                    <p>{measure.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {measure.benefits.split(", ").map((benefit) => (
-                        <Badge key={benefit} variant="secondary">
-                          {benefit}
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="bg-muted p-4 rounded-lg">
-                      <h4 className="font-medium mb-2">Implementation Tips</h4>
-                      <p className="text-sm">{measure.implementation}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+                      <p>{measure.description}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {measure.benefits.split(", ").map((benefit) => (
+                          <Badge key={benefit} variant="secondary">
+                            {benefit}
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="bg-muted p-4 rounded-lg">
+                        <h4 className="font-medium mb-2">Implementation Tips</h4>
+                        <p className="text-sm">{measure.implementation}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </TooltipProvider>
     </div>
   );
 };
