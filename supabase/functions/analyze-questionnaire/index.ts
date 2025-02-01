@@ -21,10 +21,10 @@ serve(async (req) => {
     });
     const openai = new OpenAIApi(configuration);
 
-    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures. For each recommended measure, you MUST provide:
-1. An environment score (1-5) indicating how well the measure fits the specific garden context
-2. A difficulty score (1-5) indicating how challenging it would be to implement in this specific garden
-3. An impact score (1-5) indicating the potential positive effect on biodiversity for this specific garden
+    const prompt = `Based on the following garden questionnaire responses, recommend the 10 most suitable biodiversity measures. For each recommended measure, you MUST provide:
+1. An environment score (1-10) indicating how well the measure fits the specific garden context
+2. A difficulty score (1-10) indicating how challenging it would be to implement in this specific garden
+3. An impact score (1-10) indicating the potential positive effect on biodiversity for this specific garden
 4. Clear reasoning for ALL scores based on the questionnaire responses
 
 Questionnaire Responses:
@@ -49,9 +49,9 @@ Available measures:
 
 You MUST return a JSON object with these properties:
 1. recommendations: array of recommended measure IDs (numbers 1-15)
-2. environmentScores: object mapping measure IDs to environment scores (1-5)
-3. difficultyScores: object mapping measure IDs to difficulty scores (1-5)
-4. impactScores: object mapping measure IDs to impact scores (1-5)
+2. environmentScores: object mapping measure IDs to environment scores (1-10)
+3. difficultyScores: object mapping measure IDs to difficulty scores (1-10)
+4. impactScores: object mapping measure IDs to impact scores (1-10)
 5. difficultyReasonings: object mapping measure IDs to strings explaining the difficulty score
 6. impactReasonings: object mapping measure IDs to strings explaining the impact score
 7. environmentReasonings: object mapping measure IDs to strings explaining how well the measure fits the environment
@@ -59,11 +59,11 @@ You MUST return a JSON object with these properties:
 Example response format:
 {
   "recommendations": [1, 2, 8],
-  "environmentScores": {"1": 4, "2": 5, "8": 3},
-  "difficultyScores": {"1": 2, "2": 3, "8": 2},
-  "impactScores": {"1": 4, "2": 5, "8": 4},
+  "environmentScores": {"1": 1, "2": 9, "8": 8},
+  "difficultyScores": {"1": 3, "2": 6, "8": 7},
+  "impactScores": {"1": 2, "2": 10, "8": 9},
   "difficultyReasonings": {
-    "1": "Easy to implement given the sheltered area mentioned",
+    "1": "Super difficult to implement due to the size of the garden",
     "2": "Moderate difficulty due to soil preparation needs",
     "8": "Simple to implement along existing borders"
   },
@@ -79,7 +79,7 @@ Example response format:
   }
 }
 
-IMPORTANT: You MUST provide ALL reasonings (difficulty, impact, and environment) for EACH recommended measure. Each reasoning MUST be a string that references specific aspects of the questionnaire responses. The response must be valid JSON with all reasonings as plain strings, not objects.`;
+IMPORTANT: You MUST provide ALL reasonings (difficulty, impact, and environment) for ALL 10 recommended measure. Each reasoning MUST be a string that references specific aspects of the questionnaire responses. The response must be valid JSON with all reasonings as plain strings, not objects.`;
 
     console.log('Sending prompt to OpenAI:', prompt);
 
