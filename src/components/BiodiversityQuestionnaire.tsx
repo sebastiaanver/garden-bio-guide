@@ -37,14 +37,18 @@ const BiodiversityQuestionnaire = () => {
   const renderQuestion = (question: Question) => {
     if (question.type === "single") {
       return (
-        <RadioGroup
-          value={answers[question.id] as string}
-          onValueChange={(value) => handleSingleAnswer(question.id, value)}
-          className="space-y-2"
-        >
+        <div className="space-y-2">
           {question.options.map((option) => (
             <div key={option.value} className="flex items-center space-x-2">
-              <RadioGroupItem value={option.value} id={`${question.id}-${option.value}`} />
+              <input
+                type="radio"
+                id={`${question.id}-${option.value}`}
+                name={question.id}
+                value={option.value}
+                checked={(answers[question.id] as string) === option.value}
+                onChange={(e) => handleSingleAnswer(question.id, e.target.value)}
+                className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+              />
               <label htmlFor={`${question.id}-${option.value}`} className="text-sm">
                 {option.label}
               </label>
@@ -58,7 +62,7 @@ const BiodiversityQuestionnaire = () => {
               )}
             </div>
           ))}
-        </RadioGroup>
+        </div>
       );
     }
 
@@ -120,7 +124,6 @@ const BiodiversityQuestionnaire = () => {
                   setCurrentSection((prev) => prev + 1);
                 } else {
                   console.log("Final answers:", { answers, customAnswers });
-                  // Here you would typically submit the answers
                 }
               }}
             >
