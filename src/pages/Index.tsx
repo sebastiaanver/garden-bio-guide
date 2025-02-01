@@ -42,7 +42,11 @@ const Index = () => {
     }
 
     setIsAnalyzing(true);
-    setShowAnalysis(true);
+    // Simulate analysis delay
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      setShowAnalysis(true);
+    }, 2000);
   };
 
   return (
@@ -74,7 +78,7 @@ const Index = () => {
           </div>
 
           {(showAnalysis || isAnalyzing) && (
-            <Analysis isLoading={isAnalyzing} images={images} />
+            <Analysis isLoading={isAnalyzing} />
           )}
         </div>
       </div>
