@@ -12,10 +12,10 @@ export type Measure = {
   benefits: string;
   implementation: string;
   emoji: string;
-  difficulty: number; // 1-5 scale, hardcoded
-  impact: number; // 1-5 scale, from LLM
-  impactReasoning?: string; // Reasoning from LLM for the impact score
-  environmentScore?: number; // 1-5 scale, calculated based on questionnaire/analysis
+  difficulty: number;
+  impact: number;
+  impactReasoning?: string;
+  environmentScore?: number;
 };
 
 const measures: Measure[] = [
@@ -191,6 +191,12 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
     return difficultyPoints + impactPoints + environmentPoints;
   };
 
+  const pointTypeDescriptions = {
+    difficulty: "Points awarded based on ease of implementation. Lower difficulty measures receive more points to encourage starting with simpler actions that can make an immediate impact.",
+    impact: "Points reflect the measure's potential positive effect on biodiversity. Higher points indicate greater benefits for local wildlife and ecosystem health.",
+    environment: "Points indicate how well this measure aligns with your specific environment and conditions, based on your questionnaire responses or garden analysis."
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -228,7 +234,7 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="max-w-xs">
-                                  Based on the complexity of implementation. Lower difficulty means more points.
+                                  {pointTypeDescriptions.difficulty}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
@@ -246,7 +252,7 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="max-w-xs">
-                                  {measure.impactReasoning || "Based on the measure's potential impact on biodiversity."}
+                                  {measure.impactReasoning || pointTypeDescriptions.impact}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
@@ -264,7 +270,7 @@ const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p className="max-w-xs">
-                                  Score based on how well this measure suits your specific environment.
+                                  {pointTypeDescriptions.environment}
                                 </p>
                               </TooltipContent>
                             </Tooltip>
