@@ -32,10 +32,10 @@ const BiodiversityQuestionnaire = ({
     if (skipQuestionnaire && initialRecommendations) {
       setRecommendations(initialRecommendations);
       // Set default environment scores for initial recommendations
-      const defaultScores = initialRecommendations.reduce((acc, id) => ({
+      const defaultScores = initialRecommendations?.reduce((acc, id) => ({
         ...acc,
         [id]: 3
-      }), {});
+      }), {}) || {};
       setEnvironmentScores(defaultScores);
       setShowRecommendations(true);
     }

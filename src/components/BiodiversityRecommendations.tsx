@@ -42,7 +42,9 @@ const measures: Measure[] = [
     description: "Growing food without chemical pesticides; improving soil health.",
     benefits: "Biodiversity, soil health, sustainability",
     implementation: "Use companion planting (e.g., marigolds for pest control), compost, and crop rotation.",
-    emoji: "🍅"
+    emoji: "🍅",
+    difficulty: 3,
+    impact: 4
   },
   {
     id: 4,
@@ -50,7 +52,9 @@ const measures: Measure[] = [
     description: "Water feature with shallow edges for wildlife habitat and ecosystem balance.",
     benefits: "Biodiversity, water storage, ecological function",
     implementation: "Use native water plants, avoid fish to prevent nutrient overload, maintain clean edges.",
-    emoji: "💧"
+    emoji: "💧",
+    difficulty: 4,
+    impact: 5
   },
   {
     id: 5,
@@ -58,7 +62,9 @@ const measures: Measure[] = [
     description: "Using hedgerows, trees, and shrubs instead of fences for natural separation.",
     benefits: "Biodiversity, habitat connectivity, wind protection",
     implementation: "Plant mixed hedgerows with species like hawthorn, blackthorn, or willow. Avoid impermeable barriers.",
-    emoji: "🌳"
+    emoji: "🌳",
+    difficulty: 3,
+    impact: 4
   },
   {
     id: 6,
@@ -66,7 +72,9 @@ const measures: Measure[] = [
     description: "Planting trees, including fruit trees, for ecosystem stability and food sources.",
     benefits: "Biodiversity, habitat, shade, carbon capture",
     implementation: "Use native trees; avoid excessive pruning. Incorporate a protective hedge around orchards.",
-    emoji: "🍏"
+    emoji: "🍏",
+    difficulty: 4,
+    impact: 5
   },
   {
     id: 7,
@@ -74,7 +82,9 @@ const measures: Measure[] = [
     description: "Creating water retention areas for flood control and biodiversity.",
     benefits: "Water storage, biodiversity, cooling",
     implementation: "Design for natural water drainage; plant water-tolerant species such as reeds and sedges.",
-    emoji: "💦"
+    emoji: "💦",
+    difficulty: 5,
+    impact: 4
   },
   {
     id: 8,
@@ -82,7 +92,9 @@ const measures: Measure[] = [
     description: "Planting native wildflower meadows to support pollinators and insects.",
     benefits: "Pollinators, biodiversity, habitat",
     implementation: "Use native wildflower seed mixes, minimize mowing, avoid fertilizers.",
-    emoji: "🦋"
+    emoji: "🦋",
+    difficulty: 2,
+    impact: 4
   },
   {
     id: 9,
@@ -90,7 +102,9 @@ const measures: Measure[] = [
     description: "Leaving areas untidy (piles of wood, stones, compost) to support small animals & insects.",
     benefits: "Biodiversity, habitat, food web support",
     implementation: "Create brush piles, leave dead wood, avoid chemical treatments.",
-    emoji: "🦎"
+    emoji: "🦎",
+    difficulty: 1,
+    impact: 3
   },
   {
     id: 10,
@@ -98,7 +112,9 @@ const measures: Measure[] = [
     description: "Rotational mowing to allow insects and plants to thrive.",
     benefits: "Pollinators, biodiversity, soil health",
     implementation: "Mow in sections, leave some areas undisturbed. Remove cuttings to avoid over-fertilization.",
-    emoji: "🌱"
+    emoji: "🌱",
+    difficulty: 2,
+    impact: 3
   },
   {
     id: 11,
@@ -106,7 +122,9 @@ const measures: Measure[] = [
     description: "Reducing paved areas to increase soil permeability.",
     benefits: "Biodiversity, water retention, soil health",
     implementation: "Replace impermeable surfaces with gravel, grass pavers, or permeable stones.",
-    emoji: "🌍"
+    emoji: "🌍",
+    difficulty: 4,
+    impact: 4
   },
   {
     id: 12,
@@ -114,7 +132,9 @@ const measures: Measure[] = [
     description: "Providing safe nesting sites for owls that control rodent populations.",
     benefits: "Biodiversity, natural pest control",
     implementation: "Install in barns or trees, ensure predator protection (e.g., against martens).",
-    emoji: "🦉"
+    emoji: "🦉",
+    difficulty: 3,
+    impact: 4
   },
   {
     id: 13,
@@ -122,7 +142,9 @@ const measures: Measure[] = [
     description: "Safe roosting spots for bats, which help control insect populations.",
     benefits: "Biodiversity, natural pest control",
     implementation: "Place boxes on buildings or trees near feeding areas (e.g., hedgerows, water bodies).",
-    emoji: "🦇"
+    emoji: "🦇",
+    difficulty: 2,
+    impact: 4
   },
   {
     id: 14,
@@ -130,7 +152,9 @@ const measures: Measure[] = [
     description: "Nesting sites for various bird species.",
     benefits: "Biodiversity, pest control, habitat support",
     implementation: "Provide different house types for different species. Avoid placing near high-traffic areas.",
-    emoji: "🐦"
+    emoji: "🐦",
+    difficulty: 2,
+    impact: 3
   },
   {
     id: 15,

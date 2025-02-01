@@ -84,7 +84,7 @@ const Index = () => {
       const recommendedMeasures = await analyzeQuestionnaire(data.answers);
       console.log('Generated recommendations:', recommendedMeasures);
       
-      setRecommendations(recommendedMeasures);
+      setRecommendations(recommendedMeasures.recommendations);
       setSkipQuestionnaire(true);
 
     } catch (error) {
