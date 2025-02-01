@@ -28,7 +28,7 @@ const PostalCodeInput = ({ value, onChange }: PostalCodeInputProps) => {
         value={value}
         onChange={handleChange}
         maxLength={6}
-        className="max-w-[200px] uppercase"
+        className="w-full uppercase"
       />
     </div>
   );

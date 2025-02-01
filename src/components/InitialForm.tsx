@@ -58,16 +58,17 @@ const InitialForm = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6 p-4">
       <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-left">Name</Label>
+            <Label htmlFor="name">Name</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
+              className="w-full"
             />
           </div>
           
@@ -79,43 +80,39 @@ const InitialForm = ({
       </div>
 
       <div className="space-y-4">
-        <Label className="text-left">Choose an option:</Label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="relative">
-            <Button
-              variant={selectedOption === "questionnaire" ? "default" : "outline"}
-              className={`w-full p-8 h-auto flex flex-col items-start space-y-4 whitespace-normal ${
-                selectedOption === "questionnaire" ? "bg-garden-primary" : ""
-              }`}
-              onClick={() => setSelectedOption("questionnaire")}
-            >
-              <div className="flex items-center w-full">
-                <FileText className="w-6 h-6 mr-2" />
-                <span className="text-xl font-semibold break-words text-left">Fill Questionnaire</span>
-              </div>
-              <p className="text-sm opacity-80 break-words text-left">
-                Answer questions about your garden's features and management practices to receive personalized recommendations.
-              </p>
-            </Button>
-          </div>
+        <Label>Choose an option:</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Button
+            variant={selectedOption === "questionnaire" ? "default" : "outline"}
+            className={`w-full h-full min-h-[160px] p-8 flex flex-col items-start space-y-4 whitespace-normal ${
+              selectedOption === "questionnaire" ? "bg-garden-primary" : ""
+            }`}
+            onClick={() => setSelectedOption("questionnaire")}
+          >
+            <div className="flex items-center w-full">
+              <FileText className="w-6 h-6 mr-2" />
+              <span className="text-xl font-semibold break-words text-left">Fill Questionnaire</span>
+            </div>
+            <p className="text-sm opacity-80 break-words text-left">
+              Answer questions about your garden's features and management practices to receive personalized recommendations.
+            </p>
+          </Button>
 
-          <div className="relative">
-            <Button
-              variant={selectedOption === "upload" ? "default" : "outline"}
-              className={`w-full p-8 h-auto flex flex-col items-start space-y-4 whitespace-normal ${
-                selectedOption === "upload" ? "bg-garden-primary" : ""
-              }`}
-              onClick={() => setSelectedOption("upload")}
-            >
-              <div className="flex items-center w-full">
-                <Upload className="w-6 h-6 mr-2" />
-                <span className="text-xl font-semibold break-words text-left">Upload Photos</span>
-              </div>
-              <p className="text-sm opacity-80 break-words text-left">
-                Upload photos of your garden and let our AI analyze them to provide tailored biodiversity recommendations.
-              </p>
-            </Button>
-          </div>
+          <Button
+            variant={selectedOption === "upload" ? "default" : "outline"}
+            className={`w-full h-full min-h-[160px] p-8 flex flex-col items-start space-y-4 whitespace-normal ${
+              selectedOption === "upload" ? "bg-garden-primary" : ""
+            }`}
+            onClick={() => setSelectedOption("upload")}
+          >
+            <div className="flex items-center w-full">
+              <Upload className="w-6 h-6 mr-2" />
+              <span className="text-xl font-semibold break-words text-left">Upload Photos</span>
+            </div>
+            <p className="text-sm opacity-80 break-words text-left">
+              Upload photos of your garden and let our AI analyze them to provide tailored biodiversity recommendations.
+            </p>
+          </Button>
         </div>
       </div>
 
