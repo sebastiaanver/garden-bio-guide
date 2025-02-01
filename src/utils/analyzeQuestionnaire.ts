@@ -8,6 +8,7 @@ type AnalysisResult = {
   impactScores: Record<number, number>;
   difficultyReasonings?: Record<number, string>;
   impactReasonings?: Record<number, string>;
+  environmentReasonings?: Record<number, string>;
 };
 
 type AnalysisResponse = {
@@ -37,7 +38,8 @@ export const analyzeQuestionnaire = async (
           difficultyScores: {},
           impactScores: {},
           difficultyReasonings: {},
-          impactReasonings: {}
+          impactReasonings: {},
+          environmentReasonings: {}
         }
       };
     }
@@ -51,7 +53,8 @@ export const analyzeQuestionnaire = async (
         difficultyScores: data.difficultyScores,
         impactScores: data.impactScores,
         difficultyReasonings: data.difficultyReasonings,
-        impactReasonings: data.impactReasonings
+        impactReasonings: data.impactReasonings,
+        environmentReasonings: data.environmentReasonings
       }
     };
   } catch (error) {
@@ -64,7 +67,8 @@ export const analyzeQuestionnaire = async (
         difficultyScores: {},
         impactScores: {},
         difficultyReasonings: {},
-        impactReasonings: {}
+        impactReasonings: {},
+        environmentReasonings: {}
       }
     };
   }

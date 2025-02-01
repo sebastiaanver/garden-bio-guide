@@ -181,6 +181,7 @@ interface Props {
   impactScores?: Record<number, number>;
   difficultyReasonings?: Record<number, string>;
   impactReasonings?: Record<number, string>;
+  environmentReasonings?: Record<number, string>;
 }
 
 const BiodiversityRecommendations = ({ 
@@ -189,7 +190,8 @@ const BiodiversityRecommendations = ({
   difficultyScores = {},
   impactScores = {},
   difficultyReasonings = {},
-  impactReasonings = {}
+  impactReasonings = {},
+  environmentReasonings = {}
 }: Props) => {
   const recommendedMeasures = measures
     .filter(measure => recommendations.includes(measure.id))
@@ -199,7 +201,8 @@ const BiodiversityRecommendations = ({
       difficultyScore: difficultyScores[measure.id],
       impactScore: impactScores[measure.id],
       difficultyReasoning: difficultyReasonings[measure.id],
-      impactReasoning: impactReasonings[measure.id]
+      impactReasoning: impactReasonings[measure.id],
+      environmentReasoning: environmentReasonings[measure.id]
     }));
 
   const calculateTotalPoints = (measure: Measure & { difficultyReasoning?: string; impactReasoning?: string }) => {
@@ -293,7 +296,7 @@ const BiodiversityRecommendations = ({
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
                                   <p className="max-w-xs">
-                                    Points based on how well this measure fits your specific garden environment.
+                                    {measure.environmentReasoning || "Points based on how well this measure fits your specific garden environment."}
                                   </p>
                                 </TooltipContent>
                               </Tooltip>
