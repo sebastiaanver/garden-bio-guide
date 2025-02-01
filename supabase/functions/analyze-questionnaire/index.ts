@@ -9,7 +9,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -18,7 +17,7 @@ serve(async (req) => {
     const { answers } = await req.json();
     console.log('Received answers:', answers);
 
-    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures (return only the measure IDs 1-15 in a JSON array).
+    const prompt = `Based on the following garden questionnaire responses, recommend the most suitable biodiversity measures and provide environment scores for each recommended measure (1-5 scale, where 5 means perfect fit for the environment).
 
 Questionnaire Responses:
 ${JSON.stringify(answers, null, 2)}
@@ -40,7 +39,20 @@ Available measures:
 14 = Birdhouses
 15 = Bee Hotels
 
-Return ONLY a JSON array of numbers representing the recommended measures. For example: [1, 4, 8, 15]`;
+Return a JSON object with two properties:
+1. recommendations: array of recommended measure IDs
+2. environmentScores: object mapping measure IDs to environment scores (1-5)
+
+Example response:
+{
+  "recommendations": [1, 4, 8, 15],
+  "environmentScores": {
+    "1": 4,
+    "4": 3,
+    "8": 5,
+    "15": 4
+  }
+}`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -53,7 +65,7 @@ Return ONLY a JSON array of numbers representing the recommended measures. For e
         messages: [
           {
             role: 'system',
-            content: 'You are a garden biodiversity expert. Analyze the questionnaire responses and return ONLY a JSON array of recommended measure IDs (1-15). Do not include any other text or explanation.'
+            content: 'You are a garden biodiversity expert. Analyze the questionnaire responses and return a JSON object with recommendations and environment scores.'
           },
           { role: 'user', content: prompt }
         ],
@@ -68,42 +80,50 @@ Return ONLY a JSON array of numbers representing the recommended measures. For e
       throw new Error('Invalid response from OpenAI');
     }
 
-    // Parse the response content as JSON array
-    let recommendations;
+    let result;
     try {
       const content = data.choices[0].message.content.trim();
-      recommendations = JSON.parse(content);
+      result = JSON.parse(content);
       
-      if (!Array.isArray(recommendations)) {
-        throw new Error('Response is not an array');
+      if (!Array.isArray(result.recommendations) || !result.environmentScores) {
+        throw new Error('Invalid response format');
       }
       
-      // Validate that all elements are numbers between 1 and 15
-      recommendations = recommendations.filter(num => 
-        typeof num === 'number' && num >= 1 && num <= 15
+      // Validate recommendations and scores
+      result.recommendations = result.recommendations.filter(id => 
+        typeof id === 'number' && id >= 1 && id <= 15
       );
       
-      if (recommendations.length === 0) {
-        throw new Error('No valid recommendations found');
-      }
+      result.environmentScores = Object.fromEntries(
+        Object.entries(result.environmentScores)
+          .filter(([id, score]) => 
+            result.recommendations.includes(Number(id)) &&
+            typeof score === 'number' &&
+            score >= 1 &&
+            score <= 5
+          )
+      );
+      
     } catch (error) {
       console.error('Error parsing OpenAI response:', error);
-      // Fallback to default recommendations
-      recommendations = [1, 2, 8, 15];
+      result = {
+        recommendations: [1, 2, 8, 15],
+        environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 }
+      };
     }
 
     return new Response(
-      JSON.stringify({ recommendations }),
+      JSON.stringify(result),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   } catch (error) {
     console.error('Error in analyze-questionnaire function:', error);
-    // Return default recommendations on error
     return new Response(
       JSON.stringify({ 
         recommendations: [1, 2, 8, 15],
+        environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 },
         error: error.message 
       }),
       {

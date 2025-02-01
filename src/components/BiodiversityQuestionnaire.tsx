@@ -24,12 +24,19 @@ const BiodiversityQuestionnaire = ({
   const [currentSection, setCurrentSection] = useState(0);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [recommendations, setRecommendations] = useState<number[]>([]);
+  const [environmentScores, setEnvironmentScores] = useState<Record<number, number>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (skipQuestionnaire && initialRecommendations) {
       setRecommendations(initialRecommendations);
+      // Set default environment scores for initial recommendations
+      const defaultScores = initialRecommendations.reduce((acc, id) => ({
+        ...acc,
+        [id]: 3
+      }), {});
+      setEnvironmentScores(defaultScores);
       setShowRecommendations(true);
     }
   }, [skipQuestionnaire, initialRecommendations]);
@@ -61,8 +68,9 @@ const BiodiversityQuestionnaire = ({
     setIsAnalyzing(true);
     
     try {
-      const recommendedMeasures = await analyzeQuestionnaire(answers);
-      setRecommendations(recommendedMeasures);
+      const result = await analyzeQuestionnaire(answers);
+      setRecommendations(result.recommendations);
+      setEnvironmentScores(result.environmentScores);
       setShowRecommendations(true);
     } catch (error) {
       console.error("Error analyzing questionnaire:", error);
@@ -72,6 +80,7 @@ const BiodiversityQuestionnaire = ({
         variant: "destructive",
       });
       setRecommendations([1, 2, 8, 15]);
+      setEnvironmentScores({ "1": 3, "2": 3, "8": 3, "15": 3 });
       setShowRecommendations(true);
     } finally {
       setIsAnalyzing(false);
@@ -140,7 +149,10 @@ const BiodiversityQuestionnaire = ({
   };
 
   if (showRecommendations) {
-    return <BiodiversityRecommendations recommendations={recommendations} />;
+    return <BiodiversityRecommendations 
+      recommendations={recommendations}
+      environmentScores={environmentScores}
+    />;
   }
 
   if (isAnalyzing) {

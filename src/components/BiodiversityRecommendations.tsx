@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 export type Measure = {
   id: number;
@@ -9,6 +10,9 @@ export type Measure = {
   benefits: string;
   implementation: string;
   emoji: string;
+  difficulty: number; // 1-5 scale
+  impact: number; // 1-5 scale
+  environmentScore?: number; // 1-5 scale, calculated based on questionnaire/analysis
 };
 
 const measures: Measure[] = [
@@ -18,7 +22,9 @@ const measures: Measure[] = [
     description: "Shelter for hedgehogs to overwinter and breed.",
     benefits: "Biodiversity, natural pest control, wildlife habitat",
     implementation: "Place in a sheltered, dry spot covered with leaves and twigs. No milk; cat food can be given if needed.",
-    emoji: "🦔"
+    emoji: "🦔",
+    difficulty: 2,
+    impact: 4
   },
   {
     id: 2,
@@ -26,7 +32,9 @@ const measures: Measure[] = [
     description: "Using native, layered vegetation (low plants, shrubs, trees) for year-round biodiversity.",
     benefits: "Biodiversity, cooling, soil health, ecological management",
     implementation: "Use native, pollinator-friendly, and pesticide-free plants. Ensure year-round flowering.",
-    emoji: "🌿"
+    emoji: "🌿",
+    difficulty: 3,
+    impact: 5
   },
   {
     id: 3,
@@ -130,18 +138,38 @@ const measures: Measure[] = [
     description: "Nesting sites for wild bees to support pollination.",
     benefits: "Pollinators, biodiversity, food security",
     implementation: "Use untreated wood, drill holes of varying diameters, place in sunny areas.",
-    emoji: "🐝"
+    emoji: "🐝",
+    difficulty: 2,
+    impact: 5
   }
 ];
 
 interface Props {
-  recommendations: number[]; // Array of measure IDs
+  recommendations: number[];
+  environmentScores?: Record<number, number>;
 }
 
-const BiodiversityRecommendations = ({ recommendations }: Props) => {
-  const recommendedMeasures = measures.filter(measure => 
-    recommendations.includes(measure.id)
-  );
+const BiodiversityRecommendations = ({ recommendations, environmentScores = {} }: Props) => {
+  const recommendedMeasures = measures
+    .filter(measure => recommendations.includes(measure.id))
+    .map(measure => ({
+      ...measure,
+      environmentScore: environmentScores[measure.id] || 3
+    }));
+
+  const calculateTotalScore = (measure: Measure) => {
+    // Impact is weighted more heavily than difficulty (inverse) and environment score
+    const difficultyScore = 6 - measure.difficulty; // Invert difficulty so lower is better
+    const impactWeight = 0.5;
+    const difficultyWeight = 0.25;
+    const environmentWeight = 0.25;
+
+    return (
+      (measure.impact * impactWeight) +
+      (difficultyScore * difficultyWeight) +
+      (measure.environmentScore! * environmentWeight)
+    ) * 20; // Scale to 0-100
+  };
 
   return (
     <div className="space-y-6">
@@ -152,15 +180,37 @@ const BiodiversityRecommendations = ({ recommendations }: Props) => {
         <CardContent>
           <ScrollArea className="h-[600px] pr-4">
             <div className="space-y-6">
-              {recommendedMeasures.map((measure) => (
+              {recommendedMeasures
+                .sort((a, b) => calculateTotalScore(b) - calculateTotalScore(a))
+                .map((measure) => (
                 <Card key={measure.id}>
                   <CardHeader>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-2xl">{measure.emoji}</span>
-                      <CardTitle className="text-lg">{measure.title}</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-2xl">{measure.emoji}</span>
+                        <CardTitle className="text-lg">{measure.title}</CardTitle>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Score: {Math.round(calculateTotalScore(measure))}%
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    <Progress value={calculateTotalScore(measure)} className="h-2" />
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div className="flex flex-col">
+                        <span className="text-muted-foreground">Difficulty</span>
+                        <span className="font-medium">{measure.difficulty}/5</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-muted-foreground">Impact</span>
+                        <span className="font-medium">{measure.impact}/5</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-muted-foreground">Suitability</span>
+                        <span className="font-medium">{measure.environmentScore}/5</span>
+                      </div>
+                    </div>
                     <p>{measure.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {measure.benefits.split(", ").map((benefit) => (

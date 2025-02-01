@@ -3,14 +3,12 @@ import { formatQuestionnaireForAnalysis } from './formatQuestionnaire';
 
 export const analyzeQuestionnaire = async (
   answers: Record<string, string | string[]>
-): Promise<number[]> => {
+): Promise<{ recommendations: number[], environmentScores: Record<number, number> }> => {
   try {
     console.log('Analyzing questionnaire responses:', answers);
     
-    // Format the questionnaire responses
     const formattedAnswers = formatQuestionnaireForAnalysis(answers, {});
     
-    // Call the Supabase Edge Function
     const { data, error } = await supabase.functions.invoke('analyze-questionnaire', {
       body: { answers: formattedAnswers }
     });
@@ -21,10 +19,15 @@ export const analyzeQuestionnaire = async (
     }
 
     console.log('Analysis results:', data);
-    return data.recommendations;
+    return {
+      recommendations: data.recommendations,
+      environmentScores: data.environmentScores
+    };
   } catch (error) {
     console.error('Error in analyzeQuestionnaire:', error);
-    // Fallback to basic recommendations if analysis fails
-    return [1, 2, 8, 15];
+    return {
+      recommendations: [1, 2, 8, 15],
+      environmentScores: { "1": 3, "2": 3, "8": 3, "15": 3 }
+    };
   }
 };
