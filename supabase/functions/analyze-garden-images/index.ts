@@ -7,13 +7,15 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log('Received request to analyze garden images');
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { imageUrls } = await req.json();
-    console.log('Analyzing garden images:', imageUrls);
+    console.log('Processing image URLs:', imageUrls);
 
     // Validate image URLs
     if (!imageUrls || !Array.isArray(imageUrls) || imageUrls.length === 0) {
@@ -24,14 +26,16 @@ serve(async (req) => {
       );
     }
 
-    // Verify each image URL is accessible before sending to OpenAI
+    // Verify each image URL is accessible
     try {
+      console.log('Verifying image URLs accessibility...');
       await Promise.all(imageUrls.map(async (url) => {
         const response = await fetch(url, { method: 'HEAD' });
         if (!response.ok) {
           throw new Error(`Image URL not accessible: ${url}`);
         }
       }));
+      console.log('All image URLs verified successfully');
     } catch (error) {
       console.error('Error verifying image URLs:', error);
       return new Response(
@@ -40,8 +44,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('All image URLs verified, proceeding with OpenAI analysis');
-
+    console.log('Initiating OpenAI analysis...');
     const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -53,89 +56,25 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a garden biodiversity expert analyzing garden images. Your task is to assess various aspects of the garden's biodiversity and management practices. Here's what each field means:
+            content: `You are a garden biodiversity expert analyzing garden images. Your task is to assess various aspects of the garden's biodiversity and management practices. Analyze the following aspects:
 
-1. landSize: Approximate size of the land
-   - "small": Less than 500 m²
-   - "medium": 500 m² - 2000 m²
-   - "large": More than 2000 m²
-
-2. landUse: Main purpose of the land
-   - "private_garden": Residential garden
-   - "agricultural": Farming/cultivation
-   - "mixed": Combined garden and small-scale farming
-
-3. currentMeasures: Whether biodiversity promotion measures are visible
-   - "yes": Clear evidence of biodiversity measures
-   - "no": No visible biodiversity measures
-   - "not_sure": Unclear from images
-
-4. vegetationTypes: Types of plants present (array of strings)
-   Possible values: ["lawn", "wildflower", "native_trees", "exotic", "vegetables", "other"]
-
-5. nativeSpecies: Presence of native plant species
-   - "mostly_native": Predominantly native plants
-   - "mixed": Mix of native and non-native
-   - "mostly_non_native": Mainly non-native species
-
-6. vegetationHeight: Vertical diversity of vegetation
-   - "diverse": Multiple distinct layers
-   - "some_variation": Some height differences
-   - "uniform": Mostly single-level vegetation
-
-7. wildlifeFeatures: Wildlife-supporting structures (array of strings)
-   Possible values: ["hedgehog_house", "birdhouses", "bat_boxes", "bee_hotel", "log_piles", "none"]
-
-8. waterFeatures: Presence of water bodies
-   - "natural_pond": Natural water feature
-   - "man_made_pond": Artificial pond/water feature
-   - "no_water": No visible water features
-
-9. foodSources: Availability of wildlife food
-   - "year_round": Constant food sources
-   - "seasonally": Seasonal food availability
-   - "no": No visible food sources
-
-10. grassManagement: Lawn maintenance approach
-    - "mow_regularly": Frequently mowed
-    - "leave_uncut": Some areas left natural
-    - "rotational_mowing": Varied mowing patterns
-
-11. chemicalUse: Use of chemical treatments
-    - "frequently": Regular chemical use evident
-    - "occasionally": Some chemical use
-    - "natural_methods": Natural/organic approach
-
-12. soilHealth: Soil management practices
-    - "compost": Organic matter/composting visible
-    - "chemical_fertilizers": Chemical fertilizer use
-    - "no_management": No visible soil management
-
-13. landConnectivity: Connection to other natural areas
-    - "well_connected": Links to other green spaces
-    - "somewhat_connected": Partial connectivity
-    - "isolated": No visible connections
-
-14. wildlifeBarriers: Obstacles to wildlife movement
-    - "many_barriers": Significant barriers
-    - "some_barriers": Some passable barriers
-    - "accessible": Few/no barriers
-
-15. sustainableUse: Sustainable practices visible
-    - "yes": Clear sustainable practices
-    - "no": No visible sustainable practices
-
-16. improvements: Potential for biodiversity enhancement
-    - "actively_looking": Clear room for improvement
-    - "maybe": Some potential improvements
-    - "satisfied": Already well-optimized
-
-17. aspectsToImprove: Areas needing enhancement (array of strings)
-    Possible values: ["wildlife_habitats", "plant_diversity", "water_retention", "reducing_pesticide", "encouraging_pollinators", "other"]
-
-For each recommendation you make, also provide an impact score (1-5) and reasoning for that score.
-
-Analyze the provided garden images and respond ONLY with a JSON object containing these fields plus impact scores and reasoning. Do not include any markdown formatting or explanation text.`
+1. landSize: ("small" < 500 m², "medium" 500-2000 m², "large" > 2000 m²)
+2. landUse: ("private_garden", "agricultural", "mixed")
+3. currentMeasures: ("yes", "no", "not_sure")
+4. vegetationTypes: Array of ["lawn", "wildflower", "native_trees", "exotic", "vegetables", "other"]
+5. nativeSpecies: ("mostly_native", "mixed", "mostly_non_native")
+6. vegetationHeight: ("diverse", "some_variation", "uniform")
+7. wildlifeFeatures: Array of ["hedgehog_house", "birdhouses", "bat_boxes", "bee_hotel", "log_piles", "none"]
+8. waterFeatures: ("natural_pond", "man_made_pond", "no_water")
+9. foodSources: ("year_round", "seasonally", "no")
+10. grassManagement: ("mow_regularly", "leave_uncut", "rotational_mowing")
+11. chemicalUse: ("frequently", "occasionally", "natural_methods")
+12. soilHealth: ("compost", "chemical_fertilizers", "no_management")
+13. landConnectivity: ("well_connected", "somewhat_connected", "isolated")
+14. wildlifeBarriers: ("many_barriers", "some_barriers", "accessible")
+15. sustainableUse: ("yes", "no")
+16. improvements: ("actively_looking", "maybe", "satisfied")
+17. aspectsToImprove: Array of ["wildlife_habitats", "plant_diversity", "water_retention", "reducing_pesticide", "encouraging_pollinators", "other"]`
           },
           {
             role: 'user',
@@ -162,7 +101,7 @@ Analyze the provided garden images and respond ONLY with a JSON object containin
     }
 
     const data = await openAIResponse.json();
-    console.log('OpenAI raw response:', data);
+    console.log('Received OpenAI response:', data);
 
     if (!data.choices?.[0]?.message?.content) {
       throw new Error('Invalid response format from OpenAI');
@@ -170,13 +109,13 @@ Analyze the provided garden images and respond ONLY with a JSON object containin
 
     try {
       const content = data.choices[0].message.content;
-      console.log('Content to parse:', content);
+      console.log('Parsing OpenAI response content...');
       
       const cleanContent = content.replace(/```json\n|\n```/g, '').trim();
       console.log('Cleaned content:', cleanContent);
       
       const answers = JSON.parse(cleanContent);
-      console.log('Successfully parsed answers:', answers);
+      console.log('Successfully parsed garden analysis:', answers);
 
       return new Response(
         JSON.stringify({ answers }),
@@ -184,10 +123,9 @@ Analyze the provided garden images and respond ONLY with a JSON object containin
       );
     } catch (parseError) {
       console.error('Error parsing OpenAI response:', parseError);
-      console.log('Raw content that failed to parse:', data.choices[0].message.content);
       return new Response(
         JSON.stringify({ 
-          error: 'Failed to parse OpenAI response as JSON',
+          error: 'Failed to parse garden analysis',
           details: parseError.message,
           content: data.choices[0].message.content 
         }),
@@ -198,11 +136,11 @@ Analyze the provided garden images and respond ONLY with a JSON object containin
       );
     }
   } catch (error) {
-    console.error('Error in analyze-garden-images function:', error);
+    console.error('Unexpected error in analyze-garden-images:', error);
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        details: error.toString()
+        error: 'Failed to analyze garden images',
+        details: error.message
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
