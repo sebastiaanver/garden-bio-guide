@@ -27,15 +27,25 @@ serve(async (req) => {
           {
             role: 'system',
             content: `You are a garden biodiversity expert. Analyze the garden images and fill out a questionnaire about the garden's features. 
-            Return ONLY a JSON object with the questionnaire answers, no other text.
-            
-            The questionnaire structure should match these sections and question IDs:
-            - general: landSize, landUse, currentMeasures
-            - habitat: vegetationTypes, nativeSpecies, vegetationHeight
-            - wildlife: wildlifeFeatures, waterFeatures, foodSources
-            - management: grassManagement, chemicalUse, soilHealth
-            - connectivity: landConnectivity, wildlifeBarriers, sustainableUse
-            - future: improvements, aspectsToImprove`
+            Return a JSON object with the questionnaire answers, formatted exactly like this example:
+            {
+              "landSize": "medium",
+              "landUse": "residential",
+              "currentMeasures": ["native_plants", "bird_feeders"],
+              "vegetationTypes": ["trees", "shrubs", "flowers"],
+              "nativeSpecies": "medium",
+              "vegetationHeight": "mixed",
+              "wildlifeFeatures": ["bird_nests", "insect_hotels"],
+              "waterFeatures": "none",
+              "foodSources": ["natural", "supplementary"],
+              "grassManagement": "regular_mowing",
+              "chemicalUse": "none",
+              "soilHealth": "good",
+              "landConnectivity": "partial",
+              "wildlifeBarriers": ["fences"],
+              "improvements": ["add_pond", "more_native_plants"],
+              "aspectsToImprove": ["biodiversity", "wildlife_support"]
+            }`
           },
           {
             role: 'user',
@@ -51,6 +61,7 @@ serve(async (req) => {
           }
         ],
         max_tokens: 1000,
+        temperature: 0.7
       }),
     });
 
@@ -61,20 +72,26 @@ serve(async (req) => {
     }
 
     const data = await openAIResponse.json();
-    console.log('OpenAI response:', data);
+    console.log('OpenAI raw response:', data);
 
     if (!data.choices?.[0]?.message?.content) {
       throw new Error('Invalid response format from OpenAI');
     }
 
-    // Parse the questionnaire answers
-    const answers = JSON.parse(data.choices[0].message.content);
-    console.log('Parsed answers:', answers);
+    try {
+      // Parse the response content as JSON
+      const answers = JSON.parse(data.choices[0].message.content.trim());
+      console.log('Parsed answers:', answers);
 
-    return new Response(
-      JSON.stringify({ answers }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+      return new Response(
+        JSON.stringify({ answers }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    } catch (parseError) {
+      console.error('Error parsing OpenAI response:', parseError);
+      console.log('Raw content that failed to parse:', data.choices[0].message.content);
+      throw new Error('Failed to parse OpenAI response as JSON');
+    }
   } catch (error) {
     console.error('Error in analyze-garden-images function:', error);
     return new Response(
