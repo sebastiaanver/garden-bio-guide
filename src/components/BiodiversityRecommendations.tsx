@@ -231,11 +231,11 @@ const BiodiversityRecommendations = ({
                       <div className="grid grid-cols-3 gap-8">
                         <div className="space-y-2">
                           <div className="flex flex-col">
-                            <span className="font-medium flex items-center justify-between">
+                            <span className="font-medium flex items-center justify-center gap-2">
                               Difficulty Points
                               <Tooltip>
                                 <TooltipTrigger asChild>
-                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors ml-1" />
+                                  <Info className="h-4 w-4 text-muted-foreground/50 cursor-pointer hover:text-muted-foreground transition-colors" />
                                 </TooltipTrigger>
                                 <TooltipContent side="top">
                                   <p className="max-w-xs">
@@ -244,7 +244,7 @@ const BiodiversityRecommendations = ({
                                 </TooltipContent>
                               </Tooltip>
                             </span>
-                            <span className="text-2xl font-semibold">{5 - measure.difficulty}</span>
+                            <span className="text-2xl font-semibold text-center">{5 - measure.difficulty}</span>
                           </div>
                         </div>
                         
