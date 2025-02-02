@@ -1,11 +1,15 @@
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import ChallengesAcceptedScreen from "./components/ChallengesAcceptedScreen";
 import "./App.css";
 
 function App() {
   return (
     <Router>
-      <Index />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/success" element={<ChallengesAcceptedScreen />} />
+      </Routes>
     </Router>
   );
 }

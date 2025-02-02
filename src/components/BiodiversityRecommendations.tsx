@@ -3,9 +3,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 import { measures } from "./biodiversity/measures";
 import MeasureCard from "./biodiversity/MeasureCard";
-import type { BiodiversityProps, Measure, ReasoningType } from "./biodiversity/types";
+import type { BiodiversityProps, Measure } from "./biodiversity/types";
 
 const BiodiversityRecommendations = ({ 
   recommendations, 
@@ -17,6 +18,7 @@ const BiodiversityRecommendations = ({
   environmentReasonings = {}
 }: BiodiversityProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   console.log('Received props:', {
     recommendations,
@@ -72,10 +74,9 @@ const BiodiversityRecommendations = ({
         throw new Error('Failed to accept one or more challenges');
       }
 
-      toast({
-        title: "Challenges Accepted!",
-        description: "You've successfully accepted the top 3 biodiversity challenges.",
-      });
+      // Navigate to success screen after successful API calls
+      navigate("/success");
+      
     } catch (error) {
       console.error('Error accepting challenges:', error);
       toast({
