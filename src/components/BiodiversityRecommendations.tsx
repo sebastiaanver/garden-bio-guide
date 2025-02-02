@@ -48,13 +48,13 @@ const BiodiversityRecommendations = ({
 
       // Create mission instances for each of the top 3 measures
       const missionPromises = top3Measures.map(measure => {
-        return fetch('http://localhost:8000/api/mission_instances', {
+        return fetch('http://localhost:8000/api/mission_instances/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            id: 2,
+            user: 1,
             created_at: currentDate.toISOString(),
             expires_at: expiryDate.toISOString(),
             mission_type: measure.id,
