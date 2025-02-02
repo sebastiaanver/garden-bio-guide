@@ -41,31 +41,46 @@ const BiodiversityRecommendations = ({
       const expiryDate = new Date(currentDate);
       expiryDate.setDate(currentDate.getDate() + 14); // Add 2 weeks
 
-      const response = await fetch('http://localhost:8000/api/mission_instances', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: 2,
-          created_at: currentDate.toISOString(),
-          expires_at: expiryDate.toISOString(),
-        }),
+      // Get the top 3 measures based on total points
+      const top3Measures = recommendedMeasures
+        .sort((a, b) => calculateTotalPoints(b) - calculateTotalPoints(a))
+        .slice(0, 3);
+
+      // Create mission instances for each of the top 3 measures
+      const missionPromises = top3Measures.map(measure => {
+        return fetch('http://localhost:8000/api/mission_instances', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: 2,
+            created_at: currentDate.toISOString(),
+            expires_at: expiryDate.toISOString(),
+            mission_type: measure.id,
+            points: calculateTotalPoints(measure)
+          }),
+        });
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to accept challenge');
+      const responses = await Promise.all(missionPromises);
+      
+      // Check if all requests were successful
+      const allSuccessful = responses.every(response => response.ok);
+
+      if (!allSuccessful) {
+        throw new Error('Failed to accept one or more challenges');
       }
 
       toast({
-        title: "Challenge Accepted!",
-        description: "You've successfully accepted the biodiversity challenge.",
+        title: "Challenges Accepted!",
+        description: "You've successfully accepted the top 3 biodiversity challenges.",
       });
     } catch (error) {
-      console.error('Error accepting challenge:', error);
+      console.error('Error accepting challenges:', error);
       toast({
         title: "Error",
-        description: "Failed to accept the challenge. Please try again.",
+        description: "Failed to accept the challenges. Please try again.",
         variant: "destructive",
       });
     }
