@@ -11,18 +11,18 @@ export const measures: Measure[] = [
     difficulty: 2,
     impact: 4
   },
+  // {
+  //   id: 2,
+  //   title: "Plant Selection",
+  //   description: "Using native, layered vegetation (low plants, shrubs, trees) for year-round biodiversity.",
+  //   benefits: "Biodiversity, cooling, soil health, ecological management",
+  //   implementation: "Use native, pollinator-friendly, and pesticide-free plants. Ensure year-round flowering.",
+  //   emoji: "🌿",
+  //   difficulty: 3,
+  //   impact: 5
+  // },
   {
     id: 2,
-    title: "Plant Selection",
-    description: "Using native, layered vegetation (low plants, shrubs, trees) for year-round biodiversity.",
-    benefits: "Biodiversity, cooling, soil health, ecological management",
-    implementation: "Use native, pollinator-friendly, and pesticide-free plants. Ensure year-round flowering.",
-    emoji: "🌿",
-    difficulty: 3,
-    impact: 5
-  },
-  {
-    id: 3,
     title: "Vegetable Garden",
     description: "Growing food without chemical pesticides; improving soil health.",
     benefits: "Biodiversity, soil health, sustainability",
@@ -32,7 +32,7 @@ export const measures: Measure[] = [
     impact: 4
   },
   {
-    id: 4,
+    id: 3,
     title: "Pond",
     description: "Water feature with shallow edges for wildlife habitat and ecosystem balance.",
     benefits: "Biodiversity, water storage, ecological function",
@@ -42,7 +42,7 @@ export const measures: Measure[] = [
     impact: 5
   },
   {
-    id: 5,
+    id: 4,
     title: "Natural Boundaries",
     description: "Using hedgerows, trees, and shrubs instead of fences for natural separation.",
     benefits: "Biodiversity, habitat connectivity, wind protection",
@@ -51,18 +51,18 @@ export const measures: Measure[] = [
     difficulty: 3,
     impact: 4
   },
+  // {
+  //   id: 6,
+  //   title: "Trees & Orchards",
+  //   description: "Planting trees, including fruit trees, for ecosystem stability and food sources.",
+  //   benefits: "Biodiversity, habitat, shade, carbon capture",
+  //   implementation: "Use native trees; avoid excessive pruning. Incorporate a protective hedge around orchards.",
+  //   emoji: "🍏",
+  //   difficulty: 4,
+  //   impact: 5
+  // },
   {
-    id: 6,
-    title: "Trees & Orchards",
-    description: "Planting trees, including fruit trees, for ecosystem stability and food sources.",
-    benefits: "Biodiversity, habitat, shade, carbon capture",
-    implementation: "Use native trees; avoid excessive pruning. Incorporate a protective hedge around orchards.",
-    emoji: "🍏",
-    difficulty: 4,
-    impact: 5
-  },
-  {
-    id: 7,
+    id: 5,
     title: "Wadi & Flat Bank",
     description: "Creating water retention areas for flood control and biodiversity.",
     benefits: "Water storage, biodiversity, cooling",
@@ -72,7 +72,7 @@ export const measures: Measure[] = [
     impact: 4
   },
   {
-    id: 8,
+    id: 6,
     title: "Flower Strips",
     description: "Planting native wildflower meadows to support pollinators and insects.",
     benefits: "Pollinators, biodiversity, habitat",
@@ -82,7 +82,7 @@ export const measures: Measure[] = [
     impact: 4
   },
   {
-    id: 9,
+    id: 7,
     title: "Wildlife Corners",
     description: "Leaving areas untidy (piles of wood, stones, compost) to support small animals & insects.",
     benefits: "Biodiversity, habitat, food web support",
@@ -92,7 +92,7 @@ export const measures: Measure[] = [
     impact: 3
   },
   {
-    id: 10,
+    id: 8,
     title: "Phased Mowing",
     description: "Rotational mowing to allow insects and plants to thrive.",
     benefits: "Pollinators, biodiversity, soil health",
@@ -102,7 +102,7 @@ export const measures: Measure[] = [
     impact: 3
   },
   {
-    id: 11,
+    id: 9,
     title: "Permeable Surfaces",
     description: "Reducing paved areas to increase soil permeability.",
     benefits: "Biodiversity, water retention, soil health",
@@ -112,7 +112,7 @@ export const measures: Measure[] = [
     impact: 4
   },
   {
-    id: 12,
+    id: 10,
     title: "Owl Nest Boxes",
     description: "Providing safe nesting sites for owls that control rodent populations.",
     benefits: "Biodiversity, natural pest control",
@@ -122,7 +122,7 @@ export const measures: Measure[] = [
     impact: 4
   },
   {
-    id: 13,
+    id: 11,
     title: "Bat Boxes",
     description: "Safe roosting spots for bats, which help control insect populations.",
     benefits: "Biodiversity, natural pest control",
@@ -132,7 +132,7 @@ export const measures: Measure[] = [
     impact: 4
   },
   {
-    id: 14,
+    id: 12,
     title: "Birdhouses",
     description: "Nesting sites for various bird species.",
     benefits: "Biodiversity, pest control, habitat support",
@@ -142,7 +142,7 @@ export const measures: Measure[] = [
     impact: 3
   },
   {
-    id: 15,
+    id: 13,
     title: "Bee Hotels",
     description: "Nesting sites for wild bees to support pollination.",
     benefits: "Pollinators, biodiversity, food security",

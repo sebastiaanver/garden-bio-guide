@@ -32,20 +32,18 @@ ${JSON.stringify(answers, null, 2)}
 
 Available measures:
 1 = Hedgehog House
-2 = Plant Selection
-3 = Vegetable Garden
-4 = Pond
-5 = Natural Boundaries
-6 = Trees & Orchards
-7 = Wadi & Flat Bank
-8 = Flower Strips
-9 = Wildlife Corners
-10 = Phased Mowing
-11 = Permeable Surfaces
-12 = Owl Nest Boxes
-13 = Bat Boxes
-14 = Birdhouses
-15 = Bee Hotels
+2 = Vegetable Garden
+3 = Pond
+4 = Natural Boundaries
+5 = Wadi & Flat Bank
+6 = Flower Strips
+7 = Wildlife Corners
+8 = Phased Mowing
+9 = Permeable Surfaces
+10 = Owl Nest Boxes
+11 = Bat Boxes
+12 = Birdhouses
+13 = Bee Hotels
 
 You MUST return a JSON object with these properties:
 1. recommendations: array of recommended measure IDs (numbers 1-15)

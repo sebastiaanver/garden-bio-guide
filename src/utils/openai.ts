@@ -13,7 +13,7 @@ const analyzeWithGPT = async (formattedAnswers: string): Promise<number[]> => {
         messages: [
           {
             role: "system",
-            content: `You are a biodiversity expert. Analyze the questionnaire responses and recommend appropriate measures from a list of 15 possible measures. Return ONLY the measure IDs as a JSON array. Available measures are numbered 1-15 and include options like Hedgehog House (1), Plant Selection (2), Vegetable Garden (3), etc.
+            content: `You are a biodiversity expert. Analyze the questionnaire responses and recommend appropriate measures from a list of 15 possible measures. Return ONLY the measure IDs as a JSON array. Available measures are numbered 1-13 and include options like Hedgehog House (1), Vegetable Garden (3), etc.
 
 Consider factors like:
 - Land size and use
